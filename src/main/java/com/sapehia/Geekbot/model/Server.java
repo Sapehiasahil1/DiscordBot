@@ -3,6 +3,7 @@ package com.sapehia.Geekbot.model;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,16 +16,11 @@ public class Server {
 
     private LocalTime questionTime;
 
-    @ManyToMany
-    @JoinTable(
-            name = "server_members",
-            joinColumns = @JoinColumn(name = "server_id"),
-            inverseJoinColumns = @JoinColumn(name = "member_id")
-    )
-    private List<Member> serverMembers;
+    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
+    private List<Member> serverMembers  = new ArrayList<>();
 
-    @OneToMany(mappedBy = "server")
-    private List<Question> questions;
+    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
+    private List<Question> questions = new ArrayList<>();
 
     public Server() {
     }

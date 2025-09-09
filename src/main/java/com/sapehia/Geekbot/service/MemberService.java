@@ -1,9 +1,10 @@
 package com.sapehia.Geekbot.service;
 
-import org.springframework.stereotype.Service;
+import com.sapehia.Geekbot.model.Member;
 
-@Service
-public class MemberService {
+import java.util.List;
 
-
+public interface MemberService {
+    public List<Member> getAllMembers();
+    public Member getMemberById(long id);
 }

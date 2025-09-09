@@ -2,6 +2,7 @@ package com.sapehia.Geekbot.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -12,6 +13,8 @@ public class Server {
 
     private String serverName;
 
+    private LocalTime questionTime;
+
     @ManyToMany
     @JoinTable(
             name = "server_members",
@@ -20,13 +23,18 @@ public class Server {
     )
     private List<Member> serverMembers;
 
+    @OneToMany(mappedBy = "server")
+    private List<Question> questions;
+
     public Server() {
     }
 
-    public Server(String serverId, String serverName, List<Member> serverMembers) {
+    public Server(String serverId, String serverName, List<Member> serverMembers, LocalTime questionTime, List<Question> questions) {
         this.serverId = serverId;
         this.serverName = serverName;
         this.serverMembers = serverMembers;
+        this.questionTime = questionTime;
+        this.questions = questions;
     }
 
     public String getServerId() {
@@ -45,11 +53,27 @@ public class Server {
         this.serverName = serverName;
     }
 
+    public LocalTime getQuestionTime() {
+        return questionTime;
+    }
+
+    public void setQuestionTime(LocalTime questionTime) {
+        this.questionTime = questionTime;
+    }
+
     public List<Member> getServerMembers() {
         return serverMembers;
     }
 
     public void setServerMembers(List<Member> serverMembers) {
         this.serverMembers = serverMembers;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 }

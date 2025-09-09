@@ -13,8 +13,6 @@ public class Member {
 
     private String username;
 
-//    private String serverId;
-
     @ManyToMany(mappedBy = "serverMembers")
     private List<Server> servers;
 
@@ -36,14 +34,6 @@ public class Member {
     public void setUsername(String username) {
         this.username = username;
     }
-
-//    public String getServerId() {
-//        return serverId;
-//    }
-//
-//    public void setServerId(String serverId) {
-//        this.serverId = serverId;
-//    }
 
     public List<Server> getServers() {
         return servers;

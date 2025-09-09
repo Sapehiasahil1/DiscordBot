@@ -2,6 +2,9 @@ package com.sapehia.Geekbot.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Question {
 
@@ -16,14 +19,11 @@ public class Question {
     @JoinColumn(name = "server_id")
     private Server server;
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<QuestionAssignment> assignments = new ArrayList<>();
+
 
     public Question() {
-    }
-
-    public Question(long id, String text, Server server) {
-        this.id = id;
-        this.text = text;
-        this.server = server;
     }
 
     public long getId() {
@@ -48,5 +48,13 @@ public class Question {
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public List<QuestionAssignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<QuestionAssignment> assignments) {
+        this.assignments = assignments;
     }
 }

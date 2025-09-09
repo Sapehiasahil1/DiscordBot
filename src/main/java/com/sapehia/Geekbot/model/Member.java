@@ -2,6 +2,7 @@ package com.sapehia.Geekbot.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +14,12 @@ public class Member {
 
     private String username;
 
-    @ManyToMany(mappedBy = "serverMembers")
-    private List<Server> servers;
+    @ManyToOne
+    @JoinColumn(name = "server_id")
+    private List<Server> servers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Answer> answers = new ArrayList<>();
 
     public Member() {
     }
@@ -41,5 +46,13 @@ public class Member {
 
     public void setServers(List<Server> servers) {
         this.servers = servers;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 }

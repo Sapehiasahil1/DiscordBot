@@ -14,9 +14,14 @@ public class Member {
 
     private String username;
 
-    @ManyToOne
-    @JoinColumn(name = "server_id")
+    @ManyToMany
+    @JoinTable(
+            name = "member_server",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "server_id")
+    )
     private List<Server> servers = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Answer> answers = new ArrayList<>();

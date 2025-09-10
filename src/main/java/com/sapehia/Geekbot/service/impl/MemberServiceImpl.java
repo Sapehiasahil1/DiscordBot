@@ -23,8 +23,30 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member getMemberById(long id) {
+    public Member getMemberById(String id) {
         Optional<Member> member = memberRepository.findById(id);
         return member.get();
+    }
+
+    @Override
+    public Member addMember(Member member) {
+        return memberRepository.save(member);
+    }
+
+    @Override
+    public Member getMemberByDiscordUserId(String userId) {
+        return memberRepository.findByDiscordUserId(userId)
+                .orElseThrow(()-> new RuntimeException("Member not found with discordUserId " + userId));
+
+    }
+
+    public Member getOrCreateMember(String discordUserId, String username) {
+        return memberRepository.findByDiscordUserId(discordUserId)
+                .orElseGet(() -> {
+                    com.sapehia.Geekbot.model.Member m = new com.sapehia.Geekbot.model.Member();
+                    m.setDiscordUserId(discordUserId);
+                    m.setUsername(username);
+                    return memberRepository.save(m);
+                });
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    List<Question> findByServerId(String serverId);
+    List<Question> findByServer_ServerId(String serverId);
 }

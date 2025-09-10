@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Locale;
 
 public interface AnswerService {
-    public List<Answer> getAllAnswer();
-    public List<Answer> getAnswerByMember(long id);
-    public List<Answer> getAnswerByDate(LocalDate date);
+    Answer addAnswer(Answer answer);
+    List<Answer> getAllAnswer();
+    List<Answer> getAnswerByMember(String id);
+    List<Answer> getAnswerByDate(LocalDate date);
 }

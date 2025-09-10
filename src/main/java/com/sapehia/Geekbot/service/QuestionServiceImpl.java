@@ -49,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getQuestionsForServer(String serverId) {
-        return questionRepository.findByServerId(serverId);
+        return questionRepository.findByServer_ServerId(serverId);
     }
 
     @Override

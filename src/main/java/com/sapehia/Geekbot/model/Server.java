@@ -16,7 +16,7 @@ public class Server {
 
     private LocalTime questionTime;
 
-    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "servers")
     private List<Member> serverMembers  = new ArrayList<>();
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)

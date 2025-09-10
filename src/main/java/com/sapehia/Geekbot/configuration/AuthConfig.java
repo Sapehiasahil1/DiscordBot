@@ -1,5 +1,7 @@
 package com.sapehia.Geekbot.configuration;
 
+import com.sapehia.Geekbot.service.DiscordOAuth2UserService;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,6 +9,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import com.sapehia.Geekbot.service.impl.CustomUserDetailsService;
 
@@ -27,12 +32,11 @@ public class AuthConfig {
                         .requestMatchers("/login","/register","/index").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .usernameParameter("email")
-                        .defaultSuccessUrl("/index", true)
-                        .permitAll()
-                )
+                .oauth2Login(o-> o
+                                .loginPage("/oauth2/authorization/discord")
+                                .userInfoEndpoint(u -> u.userService(discordOAuth2UserService(new RestTemplateBuilder())))
+                                .defaultSuccessUrl("/dashboard", true)
+                        )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
@@ -50,6 +54,11 @@ public class AuthConfig {
                 .passwordEncoder(encoder);
 
         return authBuilder.build();
+    }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> discordOAuth2UserService(RestTemplateBuilder restTemplateBuilder) {
+        return new DiscordOAuth2UserService(restTemplateBuilder.build());
     }
 
     @Bean

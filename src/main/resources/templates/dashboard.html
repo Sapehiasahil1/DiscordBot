@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Discord Dashboard</title>
+</head>
+<body>
+<h1>Welcome, <span th:text="${user.username}"></span>#<span th:text="${user.discriminator}"></span></h1>
+
+<h3>Your Servers</h3>
+<ul>
+    <li th:each="g : ${guilds}">
+        <strong th:text="${g.name}"></strong>
+        <span th:if="${g.isAdminOrOwner}">(Admin/Owner)</span>
+    </li>
+</ul>
+
+<hr/>
+<a href="/logout">
+    <button>Logout</button>
+</a>
+</body>
+</html>

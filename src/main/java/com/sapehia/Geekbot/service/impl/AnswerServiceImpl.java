@@ -8,6 +8,7 @@ import com.sapehia.Geekbot.service.MemberService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,6 +28,22 @@ public class AnswerServiceImpl implements AnswerService{
     }
 
     @Override
+    public List<Answer> getTodayAttendance(String serverId) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        return answerRepository.findByServerAndDate(serverId, startOfDay, endOfDay);
+    }
+
+    @Override
+    public long getUserAttendanceInLast30Days(String serverId, String memberId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.minusDays(30);
+        return answerRepository.countAttendanceInPeriod(serverId, memberId, start, now);
+    }
+
+    @Override
     public List<Answer> getAllAnswer() {
         return answerRepository.findAll();
     }
@@ -39,7 +56,8 @@ public class AnswerServiceImpl implements AnswerService{
 
     @Override
     public List<Answer> getAnswerByDate(LocalDate date) {
-        List<Answer> answers = answerRepository.findBySubmittedDate(date);
-        return answers;
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        return answerRepository.findBySubmittedDate(startOfDay, endOfDay);
     }
 }

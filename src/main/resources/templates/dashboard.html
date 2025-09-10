@@ -1,23 +1,505 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Discord Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header - Same as landing page */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: #667eea;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: #2d3748;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1a202c;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4a5568;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+
+        .user-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Servers Section */
+        .servers-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .servers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .server-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .server-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .server-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .server-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .server-role {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .server-description {
+            color: #718096;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .no-servers {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .no-servers-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .no-servers h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .servers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Success Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .server-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .server-card:nth-child(2) { animation-delay: 0.1s; }
+        .server-card:nth-child(3) { animation-delay: 0.2s; }
+        .server-card:nth-child(4) { animation-delay: 0.3s; }
+        .server-card:nth-child(5) { animation-delay: 0.4s; }
+    </style>
 </head>
 <body>
-<h1>Welcome, <span th:text="${user.username}"></span>#<span th:text="${user.discriminator}"></span></h1>
+<!-- Header - Same as landing page -->
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">
+                <div class="logo-icon">DB</div>
+                <span>Discord Bot</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/}">Home</a></li>
+                <li><a href="#" th:href="@{/product}">Product</a></li>
+                <li><a href="#" th:href="@{/templates}">Templates</a></li>
+                <li><a href="#" th:href="@{/pricing}">Pricing</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="#" class="btn-secondary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
+                <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
+                    <button type="submit" class="btn-primary">Logout</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>
 
-<h3>Your Servers</h3>
-<ul>
-    <li th:each="g : ${guilds}">
-        <strong th:text="${g.name}"></strong>
-        <span th:if="${g.isAdminOrOwner}">(Admin/Owner)</span>
-    </li>
-</ul>
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">Welcome to Your Dashboard</h1>
+            <p class="welcome-subtitle">Manage your Discord servers and bot settings</p>
 
-<hr/>
-<a href="/logout">
-    <button>Logout</button>
-</a>
+            <div class="user-info" th:if="${user}">
+                <div class="user-avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</div>
+                <div>
+                    <div style="font-weight: 600; color: #2d3748;">
+                        <span th:text="${user.username}">Username</span>#<span th:text="${user.discriminator}">0000</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers Section -->
+        <div class="servers-section">
+            <h2 class="section-title">Your Managed Servers</h2>
+
+            <!-- Server Cards Grid -->
+            <div class="servers-grid" th:if="${guilds != null and !#lists.isEmpty(guilds)}">
+                <!-- Only show servers where user is admin/owner -->
+                <div th:each="guild : ${guilds}" th:if="${guild.isAdminOrOwner}">
+                    <a href="#" class="server-card" th:href="@{'/server/' + ${guild.id}}"
+                       onclick="handleServerClick(this.href); return false;">
+                        <div class="server-header">
+                            <div class="server-icon" th:text="${#strings.substring(guild.name, 0, 1).toUpperCase()}">S</div>
+                            <div class="server-info">
+                                <h3 th:text="${guild.name}">Server Name</h3>
+                                <span class="server-role" th:text="${guild.owner ? 'Owner' : 'Admin'}">Admin</span>
+                            </div>
+                        </div>
+                        <div class="server-description">
+                            Click to manage bot settings and view attendance data for this server.
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- No Servers Message -->
+            <div class="no-servers" id="no-admin-servers"
+                 th:if="${guilds == null or guilds.isEmpty() or !hasAdminGuilds}">
+                <h3>No Managed Servers Found</h3>
+                <p>You don't have admin or owner permissions in any Discord servers yet.</p>
+                <p style="margin-top: 15px;">
+                    <a href="#" class="btn-primary" style="display: inline-block;">Invite Bot to Server</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Handle server card clicks
+    function handleServerClick(url) {
+        // Extract server ID from URL
+        const serverId = url.split('/').pop();
+
+        // Show loading state
+        const card = event.target.closest('.server-card');
+        if (card) {
+            card.style.opacity = '0.7';
+            card.style.transform = 'scale(0.98)';
+        }
+
+        // Make request to controller
+        fetch(`/server/${serverId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to server management page
+                window.location.href = url;
+            } else {
+                console.error('Failed to access server');
+                // Reset card state
+                if (card) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Reset card state
+            if (card) {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }
+        });
+    }
+
+    // Add hover effects to server cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const serverCards = document.querySelectorAll('.server-card');
+        const serversGrid = document.querySelector('.servers-grid');
+        const noAdminServers = document.getElementById('no-admin-servers');
+
+        // Check if there are any admin/owner servers visible
+        if (serverCards.length === 0 && serversGrid) {
+            // Show no admin servers message if grid exists but no cards are visible
+            if (noAdminServers) {
+                noAdminServers.style.display = 'block';
+            }
+        }
+
+        serverCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Animate cards on load
+        serverCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+
+    // Add logout confirmation
+    document.querySelector('form[action*="/logout"] button').addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to logout?')) {
+            e.preventDefault();
+        }
+    });
+</script>
 </body>
 </html>

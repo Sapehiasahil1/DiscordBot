@@ -35,16 +35,23 @@ public class AuthController {
         System.out.println("Logged in as: " + userAttributes.get("username") + "#" + userAttributes.get("discriminator"));
         System.out.println("User ID: " + userAttributes.get("id"));
 
+        boolean hasAdminGuilds = false;
+
         if (guilds != null) {
             System.out.println("Guilds:");
             for (Map<String, Object> guild : guilds) {
-                System.out.println(" - " + guild.get("name") + " | Admin/Owner: " + guild.get("isAdminOrOwner"));
+                boolean isAdminOrOwner = (Boolean) guild.get("isAdminOrOwner");
+                System.out.println(" - " + guild.get("name") + " | Admin/Owner: " + isAdminOrOwner);
+
+                if (isAdminOrOwner) {
+                    hasAdminGuilds = true;
+                }
             }
         }
 
         model.addAttribute("user", userAttributes);
         model.addAttribute("guilds", guilds);
-
+        model.addAttribute("hasAdminGuilds", hasAdminGuilds);
         return "dashboard";
     }
 

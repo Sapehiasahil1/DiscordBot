@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeekBot - Work Better Together</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: #667eea;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #2d3748;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1a202c;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-slack {
+            background: #4a154b;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-teams {
+            background: #464eb8;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-slack:hover, .btn-teams:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .free-text {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 60px;
+        }
+
+        /* Globe Background */
+        #home-globe {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        @media(min-width: 991px) {
+            #home-globe {
+                background-image: url('https://geekbot.com/wp-content/themes/geekbot_new/images/new/landing/globe@2x.webp');
+                background-repeat: no-repeat;
+                background-position: right center;
+                background-size: contain;
+            }
+        }
+
+        /* User Avatars */
+        .user-avatars {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            z-index: 3;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .user-card:nth-child(2) {
+            animation-delay: -2s;
+            margin-left: 40px;
+        }
+
+        .user-card:nth-child(3) {
+            animation-delay: -4s;
+            margin-left: -20px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .user-info .status {
+            font-size: 11px;
+            color: #38a169;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #38a169;
+            border-radius: 50%;
+        }
+
+        /* Ratings */
+        .ratings {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+
+        .rating-item {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
+        }
+
+        .rating-item .platform {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .rating-item .score {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .stars {
+            color: #f6ad55;
+            font-size: 14px;
+        }
+
+        /* Brand Logos */
+        .brands {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-top: 80px;
+            flex-wrap: wrap;
+            opacity: 0.6;
+        }
+
+        .brand-logo {
+            height: 40px;
+            filter: grayscale(100%);
+            transition: all 0.3s ease;
+        }
+
+        .brand-logo:hover {
+            filter: grayscale(0%);
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .user-avatars {
+                display: none;
+            }
+
+            .ratings {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">DB</div>
+                    <span>Discord Bot</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#" th:href="@{/product}">Product</a></li>
+                    <li><a href="#" th:href="@{/templates}">Templates</a></li>
+                    <li><a href="#" th:href="@{/pricing}">Pricing</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <a href="#" class="btn-login" th:href="@{/login}" sec:authorize="isAnonymous()">Login</a>
+                    <a href="#" class="btn-primary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
+                    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
+                        <button type="submit" class="btn-primary">Logout</button>
+                    </form>
+                </div>
+
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Globe Background -->
+            <div id="home-globe"></div>
+
+<!--            &lt;!&ndash; User Avatars &ndash;&gt;-->
+<!--            <div class="user-avatars">-->
+<!--                <div class="user-card">-->
+<!--                    <div class="user-avatar">B</div>-->
+<!--                    <div class="user-info">-->
+<!--                        <h4>Brandon</h4>-->
+<!--                        <p>UI/UX Design</p>-->
+<!--                        <div class="status">-->
+<!--                            <div class="status-dot"></div>-->
+<!--                            Helsinki - 7pm-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="user-card">-->
+<!--                    <div class="user-avatar">K</div>-->
+<!--                    <div class="user-info">-->
+<!--                        <h4>Kate</h4>-->
+<!--                        <p>Product Manager</p>-->
+<!--                        <div class="status">-->
+<!--                            <div class="status-dot"></div>-->
+<!--                            Los Angeles - 9am-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="user-card">-->
+<!--                    <div class="user-avatar">N</div>-->
+<!--                    <div class="user-info">-->
+<!--                        <h4>Noah</h4>-->
+<!--                        <p>Full-stack Engineer</p>-->
+<!--                        <div class="status">-->
+<!--                            <div class="status-dot"></div>-->
+<!--                            Buenos Aires - 2pm-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <!-- Hero Section -->
+            <div class="hero">
+                <h1>
+                    Work <span class="highlight">better together</span><br>
+                    wherever <strong>you are!</strong>
+                </h1>
+                <p class="hero-subtitle">
+                    “The easiest way to take daily attendance and keep your team on track — all inside Discord.”
+                </p>
+
+                <div class="cta-buttons">
+                    <a href="#" class="btn-slack" th:href="@{/add-to-slack}">
+                        <span>🔧</span> Add to Discord
+                    </a>
+
+                </div>
+
+                <p class="free-text">Free for teams of up to 10 users - no credit card required.</p>
+            </div>
+
+            <!-- Ratings -->
+            <div class="ratings">
+                <div class="rating-item">
+                    <div class="platform">💼 GetApp</div>
+                    <div class="score">4.9</div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="rating-item">
+                    <div class="platform">📈 Capterra</div>
+                    <div class="score">4.9</div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="rating-item">
+                    <div class="platform">⭐ Reviews</div>
+                    <div class="score">4.6</div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+
+            <!-- Brand Logos -->
+            <div class="brands">
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Sword</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">WeTransfer</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">BLUEGROUND</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">moz://a</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">zendesk</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Adobe</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">productboard</span>
+                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Mural</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.btn-slack, .btn-teams, .btn-primary');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Animate user cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.user-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

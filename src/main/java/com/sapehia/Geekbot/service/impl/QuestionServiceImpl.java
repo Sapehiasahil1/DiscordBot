@@ -1,10 +1,8 @@
-package com.sapehia.Geekbot.service;
+package com.sapehia.Geekbot.service.impl;
 
 import com.sapehia.Geekbot.model.Question;
-import com.sapehia.Geekbot.model.Server;
 import com.sapehia.Geekbot.repository.QuestionRepository;
-import com.sapehia.Geekbot.repository.ServerRepository;
-import com.sapehia.Geekbot.service.impl.QuestionService;
+import com.sapehia.Geekbot.service.QuestionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,22 +11,13 @@ import java.util.List;
 public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final ServerRepository serverRepository;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, ServerRepository serverRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
-        this.serverRepository = serverRepository;
     }
 
     @Override
-    public Question createQuestion(String serverId, String text) {
-        Question question = new Question();
-
-        Server server = serverRepository.findById(serverId)
-                        .orElseThrow(()-> new RuntimeException("Server not found with id " + serverId));
-        question.setServer(server);
-        question.setText(text);
-
+    public Question createQuestion(Question question) {
         return questionRepository.save(question);
     }
 
@@ -49,12 +38,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getQuestionsForServer(String serverId) {
-        return questionRepository.findByServerId(serverId);
+        return questionRepository.findByServer_ServerId(serverId);
     }
 
     @Override
     public Question getQuestionById(Long questionId) {
         return questionRepository.findById(questionId)
-                .orElseThrow(()-> new RuntimeException("Quesetion not found with id " + questionId));
+                .orElseThrow(()-> new RuntimeException("Question not found with id " + questionId));
     }
 }

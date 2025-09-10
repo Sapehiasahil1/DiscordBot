@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Server {
@@ -16,8 +18,9 @@ public class Server {
 
     private LocalTime questionTime;
 
-    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
-    private List<Member> serverMembers  = new ArrayList<>();
+    @ManyToMany(mappedBy = "servers")
+    private Set<Member> serverMembers = new HashSet<>();
+
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
     private List<Question> questions = new ArrayList<>();
@@ -25,7 +28,7 @@ public class Server {
     public Server() {
     }
 
-    public Server(String serverId, String serverName, List<Member> serverMembers, LocalTime questionTime, List<Question> questions) {
+    public Server(String serverId, String serverName, HashSet<Member> serverMembers, LocalTime questionTime, List<Question> questions) {
         this.serverId = serverId;
         this.serverName = serverName;
         this.serverMembers = serverMembers;
@@ -57,11 +60,11 @@ public class Server {
         this.questionTime = questionTime;
     }
 
-    public List<Member> getServerMembers() {
+    public Set<Member> getServerMembers() {
         return serverMembers;
     }
 
-    public void setServerMembers(List<Member> serverMembers) {
+    public void setServerMembers(HashSet<Member> serverMembers) {
         this.serverMembers = serverMembers;
     }
 

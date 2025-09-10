@@ -22,12 +22,17 @@ public class AnswerServiceImpl implements AnswerService{
     }
 
     @Override
+    public Answer addAnswer(Answer answer) {
+        return answerRepository.save(answer);
+    }
+
+    @Override
     public List<Answer> getAllAnswer() {
         return answerRepository.findAll();
     }
 
     @Override
-    public List<Answer> getAnswerByMember(long id) {
+    public List<Answer> getAnswerByMember(String id) {
         Member member = memberService.getMemberById(id);
         return member.getAnswers();
     }

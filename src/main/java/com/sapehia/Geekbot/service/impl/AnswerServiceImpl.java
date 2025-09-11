@@ -28,13 +28,13 @@ public class AnswerServiceImpl implements AnswerService{
     }
 
     @Override
-    public List<Answer> getTodayAttendance(String serverId) {
+    public List<Answer> getTodayMembersResponse(String serverId) {
         LocalDate today = LocalDate.now();
         return answerRepository.findAllByServerIdAndDate(serverId, today);
     }
 
     @Override
-    public long getUserAttendanceInLast30Days(String serverId, String memberId) {
+    public long getUserResponsesInLast30Days(String serverId, String memberId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.minusDays(30);
         return answerRepository.countAttendanceInPeriod(serverId, memberId, start, now);

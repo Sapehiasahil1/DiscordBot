@@ -19,7 +19,7 @@ public class Server {
     private LocalTime questionTime;
 
     @ManyToMany(mappedBy = "servers")
-    private Set<Member> serverMembers = new HashSet<>();
+    private List<Member> serverMembers = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
@@ -28,7 +28,7 @@ public class Server {
     public Server() {
     }
 
-    public Server(String serverId, String serverName, HashSet<Member> serverMembers, LocalTime questionTime, List<Question> questions) {
+    public Server(String serverId, String serverName, ArrayList<Member> serverMembers, LocalTime questionTime, List<Question> questions) {
         this.serverId = serverId;
         this.serverName = serverName;
         this.serverMembers = serverMembers;
@@ -60,11 +60,11 @@ public class Server {
         this.questionTime = questionTime;
     }
 
-    public Set<Member> getServerMembers() {
+    public List<Member> getServerMembers() {
         return serverMembers;
     }
 
-    public void setServerMembers(HashSet<Member> serverMembers) {
+    public void setServerMembers(List<Member> serverMembers) {
         this.serverMembers = serverMembers;
     }
 

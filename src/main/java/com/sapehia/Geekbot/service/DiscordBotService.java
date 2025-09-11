@@ -71,7 +71,9 @@ public class DiscordBotService extends ListenerAdapter {
         serverEntity.setServerId(guild.getId());
         serverEntity.setServerName(guild.getName());
         serverEntity.setQuestionTime(LocalTime.of(9, 30));
-        serverEntity.setServerMembers(new HashSet<>());
+
+
+        final Server savedServer = serverService.addServer(serverEntity);
 
         guild.loadMembers().onSuccess(members -> {
             for (Member member : members) {
@@ -80,14 +82,15 @@ public class DiscordBotService extends ListenerAdapter {
                 com.sapehia.Geekbot.model.Member memberEntity =
                         memberService.getOrCreateMember(member.getId(), member.getUser().getName());
 
-                serverEntity.getServerMembers().add(memberEntity);
-                memberEntity.getServers().add(serverEntity);
+                savedServer.getServerMembers().add(memberEntity);
+                memberEntity.getServers().add(savedServer);
+
+                memberService.addMember(memberEntity);
             }
 
-            serverService.addServer(serverEntity);
+            serverService.addServer(savedServer);
 
-            createDefaultQuestions(serverEntity);
-
+            createDefaultQuestions(savedServer);
             System.out.println("Stored new server: " + guild.getName());
         });
     }

@@ -1,9 +1,12 @@
 package com.sapehia.Geekbot.service.impl;
 
+import com.sapehia.Geekbot.model.Answer;
 import com.sapehia.Geekbot.model.Member;
 import com.sapehia.Geekbot.model.Server;
+import com.sapehia.Geekbot.repository.AnswerRepository;
 import com.sapehia.Geekbot.repository.MemberRepository;
 import com.sapehia.Geekbot.repository.ServerRepository;
+import com.sapehia.Geekbot.service.AnswerService;
 import com.sapehia.Geekbot.service.ServerService;
 import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.JDA;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,14 +22,16 @@ import java.util.Set;
 @Service
 public class ServerServiceImpl implements ServerService {
 
-    private  final ServerRepository serverRepository;
+    private final ServerRepository serverRepository;
     private final MemberRepository memberRepository;
+    private final AnswerService answerService;
 
     private JDA jda;
 
-    public ServerServiceImpl(ServerRepository serverRepository, MemberRepository memberRepository) {
+    public ServerServiceImpl(ServerRepository serverRepository, MemberRepository memberRepository, AnswerService answerService) {
         this.serverRepository = serverRepository;
         this.memberRepository = memberRepository;
+        this.answerService = answerService;
     }
 
     @Autowired
@@ -34,7 +40,7 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public Set<Member> listOfMembers(String serverId) {
+    public List<Member> listOfMembers(String serverId) {
         Server server = serverRepository.findById(serverId).orElseThrow();
         return server.getServerMembers();
     }
@@ -42,7 +48,7 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public Server getServerById(String serverId) {
         return serverRepository.findById(serverId)
-                .orElseThrow(()-> new RuntimeException("Server not found with id " + serverId));
+                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
     }
 
     @Override
@@ -60,9 +66,9 @@ public class ServerServiceImpl implements ServerService {
         Server server = serverRepository.findById(guildId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 
-        if (server.getServerMembers() == null) {
-            server.setServerMembers(new HashSet<>());
-        }
+//        if (server.getServerMembers() == null) {
+//            server.setServerMembers(new ArrayList<>());
+//        }
 
         server.getServerMembers().add(memberEntity);
         memberEntity.getServers().add(server);
@@ -97,5 +103,17 @@ public class ServerServiceImpl implements ServerService {
             serverRepository.save(server);
             memberRepository.save(member);
         }
+    }
+
+    @Override
+    public Set<Member> uniqueMemberResponse(String serverId, List<Member> members) {
+        List<Answer> answers = answerService.getTodayMembersResponse(serverId);
+
+        Set<Member> uniqueMembers = new HashSet<>();
+
+        for (Answer answer : answers) {
+            uniqueMembers.add(answer.getMember());
+        }
+        return uniqueMembers;
     }
 }

@@ -14,7 +14,7 @@ public class Member {
 
     private String username;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "member_server",
             joinColumns = @JoinColumn(name = "member_id"),

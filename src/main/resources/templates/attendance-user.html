@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Attendance</title>
+</head>
+<body>
+<h1>Attendance of Member [[${memberId}]] (last 30 days)</h1>
+<p>Days Present: <strong th:text="${attendanceCount}"></strong></p>
+</body>
+</html>

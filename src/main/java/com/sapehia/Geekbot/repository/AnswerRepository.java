@@ -27,6 +27,12 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
                                      @Param("dateStart") LocalDateTime dateStart,
                                      @Param("dateEnd") LocalDateTime dateEnd);
 
+    @Query("SELECT a FROM Answer a " +
+            "WHERE a.assignment.server.serverId = :serverId " +
+            "AND a.assignment.date = :date")
+    List<Answer> findAllByServerIdAndDate(@Param("serverId") String serverId,
+                                          @Param("date") LocalDate date);
+
     @Query("SELECT COUNT(DISTINCT FUNCTION('DATE', a.submittedAt)) " +
             "FROM Answer a " +
             "JOIN a.member m " +

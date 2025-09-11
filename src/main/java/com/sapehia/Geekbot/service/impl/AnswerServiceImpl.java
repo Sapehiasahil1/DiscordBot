@@ -30,10 +30,7 @@ public class AnswerServiceImpl implements AnswerService{
     @Override
     public List<Answer> getTodayAttendance(String serverId) {
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-
-        return answerRepository.findByServerAndDate(serverId, startOfDay, endOfDay);
+        return answerRepository.findAllByServerIdAndDate(serverId, today);
     }
 
     @Override

@@ -1,18 +1,24 @@
 package com.sapehia.Geekbot.controller;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class AuthController {
+
+    private final JDA jda;
+
+    public AuthController(JDA jda) {
+        this.jda = jda;
+    }
 
     @GetMapping("/")
     public String home() {
@@ -27,23 +33,30 @@ public class AuthController {
         System.out.println("Logged in as: " + userAttributes.get("username") + "#" + userAttributes.get("discriminator"));
         System.out.println("User ID: " + userAttributes.get("id"));
 
+        Set<String> botGuildIds = jda.getGuilds()
+                .stream()
+                .map(Guild::getId)
+                .collect(Collectors.toSet());
+
+        List<Map<String, Object>> filteredGuilds = new ArrayList<>();
         boolean hasAdminGuilds = false;
 
         if (guilds != null) {
-            System.out.println("Guilds:");
             for (Map<String, Object> guild : guilds) {
                 boolean isAdminOrOwner = (Boolean) guild.get("isAdminOrOwner");
-                System.out.println(" - " + guild.get("name") + " | Admin/Owner: " + isAdminOrOwner);
+                String guildId = (String) guild.get("id");
 
-                if (isAdminOrOwner) {
+                if (isAdminOrOwner && botGuildIds.contains(guildId)) {
+                    filteredGuilds.add(guild);
                     hasAdminGuilds = true;
                 }
             }
         }
 
         model.addAttribute("user", userAttributes);
-        model.addAttribute("guilds", guilds);
+        model.addAttribute("guilds", filteredGuilds);
         model.addAttribute("hasAdminGuilds", hasAdminGuilds);
+
         return "dashboard";
     }
 }

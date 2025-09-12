@@ -387,7 +387,6 @@
                     <li><a href="#" th:href="@{/pricing}">Pricing</a></li>
                 </ul>
                 <div class="nav-buttons">
-                    <a href="#" class="btn-login" th:href="@{/login}" sec:authorize="isAnonymous()">Login</a>
                     <a href="#" class="btn-primary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
                     <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
                         <button type="submit" class="btn-primary">Logout</button>

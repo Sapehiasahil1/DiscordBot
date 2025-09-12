@@ -22,7 +22,7 @@ public class AuthConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(o-> o
@@ -32,7 +32,7 @@ public class AuthConfig {
                         )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("/")
                 );
 
         return http.build();

@@ -3,6 +3,8 @@ package com.sapehia.Geekbot.service.impl;
 import com.sapehia.Geekbot.model.*;
 import com.sapehia.Geekbot.repository.*;
 import com.sapehia.Geekbot.service.AnswerService;
+import com.sapehia.Geekbot.service.QuestionAssignmentService;
+import com.sapehia.Geekbot.service.QuestionService;
 import com.sapehia.Geekbot.service.ServerService;
 import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.JDA;
@@ -22,21 +24,21 @@ public class ServerServiceImpl implements ServerService {
     private final ServerRepository serverRepository;
     private final MemberRepository memberRepository;
     private final AnswerService answerService;
-    private final QuestionRepository questionRepository;
-    private final QuestionAssignmentRepository questionAssignmentRepository;
+    private final QuestionService questionService;
+    private final QuestionAssignmentService questionAssignmentService;
 
     private JDA jda;
 
     public ServerServiceImpl(ServerRepository serverRepository,
                              MemberRepository memberRepository,
                              AnswerService answerService,
-                             QuestionRepository questionRepository,
-                             QuestionAssignmentRepository questionAssignmentRepository) {
+                             QuestionService questionService,
+                             QuestionAssignmentService questionAssignmentService) {
         this.serverRepository = serverRepository;
         this.memberRepository = memberRepository;
         this.answerService = answerService;
-        this.questionRepository = questionRepository;
-        this.questionAssignmentRepository = questionAssignmentRepository;
+        this.questionService = questionService;
+        this.questionAssignmentService = questionAssignmentService;
     }
 
     @Autowired
@@ -142,7 +144,15 @@ public class ServerServiceImpl implements ServerService {
             Question q = new Question();
             q.setText(qText);
             q.setServer(server);
-            server.getQuestions().add(q);
+
+            Question savedQuestion = questionService.createQuestion(q);
+
+            QuestionAssignment assignment = new QuestionAssignment();
+            assignment.setServer(server);
+            assignment.setQuestion(savedQuestion);
+            assignment.setDate(LocalDate.now());
+
+            questionAssignmentService.save(assignment);
         }
 
         serverRepository.save(server);

@@ -1,23 +1,17 @@
 package com.sapehia.Geekbot.controller;
 
 import com.sapehia.Geekbot.model.*;
-import com.sapehia.Geekbot.service.QuestionService;
-import com.sapehia.Geekbot.service.ServerService;
+import com.sapehia.Geekbot.service.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import com.sapehia.Geekbot.service.AnswerService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,13 +20,20 @@ public class AttendanceController {
     private final AnswerService answerService;
     private final ServerService serverService;
     private final QuestionService questionService;
+    private final MemberService memberService;
+    private final QuestionAssignmentService questionAssignmentService;
 
     public AttendanceController (AnswerService answerService,
                                  ServerService serverService,
-                                 QuestionService questionService) {
+                                 QuestionService questionService,
+                                 MemberService memberService,
+                                 QuestionAssignmentService questionAssignmentService
+    ) {
         this.answerService = answerService;
         this.serverService = serverService;
         this.questionService = questionService;
+        this.questionAssignmentService = questionAssignmentService;
+        this.memberService = memberService;
     }
 
     @GetMapping("/{serverId}")
@@ -77,6 +78,58 @@ public class AttendanceController {
         model.addAttribute("endDate", endDate);
 
         return "attendance-today";
+    }
+
+
+    @GetMapping("/{serverId}/member/{userId}/today")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getMemberTodayDetails(
+            @PathVariable String serverId,
+            @PathVariable String userId) {
+
+        try {
+            LocalDate today = LocalDate.now();
+
+            Member member = memberService.getMemberByDiscordUserId(userId);
+            if (member == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<QuestionAssignment> todayAssignments = questionAssignmentService
+                    .getAssignmentsByServerAndDate(serverId, today);
+
+            List<Map<String, Object>> responses = new ArrayList<>();
+
+            for (QuestionAssignment assignment : todayAssignments) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("questionText", assignment.getQuestion().getText());
+                responseData.put("date", today.toString());
+
+                Answer answer = answerService.getAnswerByMemberAndAssignment(userId, assignment.getId());
+
+                if (answer != null) {
+                    responseData.put("hasResponse", true);
+                    responseData.put("response", answer.getResponse());
+                    responseData.put("submittedAt", answer.getSubmittedAt().toString());
+                } else {
+                    responseData.put("hasResponse", false);
+                    responseData.put("response", null);
+                    responseData.put("submittedAt", null);
+                }
+
+                responses.add(responseData);
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("memberName", member.getUsername());
+            result.put("responses", responses);
+            result.put("date", today.toString());
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/today/{serverId}")

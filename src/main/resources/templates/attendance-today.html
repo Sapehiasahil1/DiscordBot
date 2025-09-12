@@ -437,7 +437,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalMemberName">Member Details</h3>
-            <p>Daily Responses</p>
+            <p>Today's Responses</p>
         </div>
         <div class="modal-body" id="modalBody">
             <!-- Daily responses will be populated here -->
@@ -660,38 +660,77 @@
 
     function showMemberDetails(userId, username) {
         document.getElementById('modalMemberName').textContent = username;
-
-        // In a real implementation, you would fetch this data from the server
-        // For now, we'll simulate it with sample data
-        const modalBodyHTML = `
-            <div class="day-item">
-                <div class="day-header">
-                    <span>2023-10-15</span>
-                    <span class="status-responded">Responded</span>
-                </div>
-                <div class="question-text">What did you work on today?</div>
-                <div class="answer-text">Worked on the user authentication module and fixed some bugs.</div>
-            </div>
-            <div class="day-item">
-                <div class="day-header">
-                    <span>2023-10-14</span>
-                    <span class="status-responded">Responded</span>
-                </div>
-                <div class="question-text">Any blockers or challenges?</div>
-                <div class="answer-text">Facing issues with JWT token expiration.</div>
-            </div>
-            <div class="day-item">
-                <div class="day-header">
-                    <span>2023-10-13</span>
-                    <span class="status-not-responded">Not Responded</span>
-                </div>
-                <div class="question-text">What are your plans for tomorrow?</div>
-                <div class="no-answer">No response provided</div>
-            </div>
-        `;
-
-        document.getElementById('modalBody').innerHTML = modalBodyHTML;
+        document.getElementById('modalBody').innerHTML = '<div style="text-align: center; padding: 20px;">Loading...</div>';
         document.getElementById('memberModal').style.display = 'block';
+
+        // Get the current serverId from the URL or a hidden field
+        const pathParts = window.location.pathname.split('/');
+        const serverId = pathParts[pathParts.length - 1]; // Assuming URL is /attendance/{serverId}
+
+        // Make AJAX request to get member's today responses
+        fetch(`/attendance/${serverId}/member/${userId}/today`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayMemberResponses(data);
+            })
+            .catch(error => {
+                console.error('Error fetching member details:', error);
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="no-data" style="text-align: center; padding: 20px; color: #ef4444;">
+                        <p>Error loading member details. Please try again.</p>
+                    </div>
+                `;
+            });
+    }
+
+    function displayMemberResponses(data) {
+        const modalBody = document.getElementById('modalBody');
+
+        if (!data.responses || data.responses.length === 0) {
+            modalBody.innerHTML = `
+                <div class="no-data" style="text-align: center; padding: 20px;">
+                    <p>No questions assigned for today.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let modalBodyHTML = '';
+
+        data.responses.forEach(response => {
+            const statusClass = response.hasResponse ? 'status-responded' : 'status-not-responded';
+            const statusText = response.hasResponse ? 'Responded' : 'Not Responded';
+
+            modalBodyHTML += `
+                <div class="day-item">
+                    <div class="day-header">
+                        <span>${formatDateForDisplay(response.date)} (Today)</span>
+                        <span class="${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="question-text">${response.questionText}</div>
+                    ${response.hasResponse ?
+                        `<div class="answer-text">${response.response}</div>` :
+                        `<div class="no-answer">No response provided</div>`
+                    }
+                </div>
+            `;
+        });
+
+        modalBody.innerHTML = modalBodyHTML;
+    }
+
+    function formatDateForDisplay(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     }
 
     function closeMemberModal() {

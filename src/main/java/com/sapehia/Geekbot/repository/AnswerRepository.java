@@ -58,4 +58,5 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
+    Answer findByMemberDiscordUserIdAndAssignmentId(String discordUserId, Long assignmentId);
 }

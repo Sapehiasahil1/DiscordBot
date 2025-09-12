@@ -68,4 +68,14 @@ public class AnswerServiceImpl implements AnswerService{
     public int getRespondedDaysCount(String serverId, String memberId, LocalDate startDate, LocalDate endDate) {
         return answerRepository.countDistinctDaysByMemberAndServerAndDateBetween(memberId, serverId, startDate, endDate);
     }
+
+    @Override
+    public String findResponseForMemberQuestionOnDate(String serverId, String memberId, long id, LocalDate today) {
+        return "";
+    }
+
+    @Override
+    public Answer getAnswerByMemberAndAssignment(String discordUserId, Long assignmentId) {
+        return answerRepository.findByMemberDiscordUserIdAndAssignmentId(discordUserId, assignmentId);
+    }
 }

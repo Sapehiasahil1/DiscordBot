@@ -16,4 +16,8 @@ public interface AnswerService {
     List<Answer> getAnswersByDateRange(String serverId, LocalDate startDate, LocalDate endDate);
 
     int getRespondedDaysCount(String serverId, String discordUserId, LocalDate startDate, LocalDate endDate);
+
+    String findResponseForMemberQuestionOnDate(String serverId, String memberId, long id, LocalDate today);
+
+    Answer getAnswerByMemberAndAssignment(String userId, Long id);
 }

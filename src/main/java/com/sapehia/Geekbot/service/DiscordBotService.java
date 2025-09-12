@@ -85,9 +85,13 @@ public class DiscordBotService extends ListenerAdapter {
                         member.getUser().getName()
                 );
             }
+
+            sendSetupInstructions(guild, savedServer);
+
             System.out.println("Stored new server: " + guild.getName());
         });
     }
+
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         Member discordMember = event.getMember();
@@ -254,6 +258,31 @@ public class DiscordBotService extends ListenerAdapter {
             assignment.setDate(LocalDate.now());
 
             questionAssignmentService.save(assignment);
+        }
+    }
+
+    private void sendSetupInstructions(Guild guild, Server server) {
+        String setupUrl = "http://localhost:8080/server/"+ server.getServerId() +"/configuration";
+
+        String message = "👋 Thanks for adding me to **" + guild.getName() + "**!\n\n"
+                + "✅ Default daily check-in questions have been set:\n"
+                + "1. What did you complete yesterday?\n"
+                + "2. What are your plans for today?\n"
+                + "3. Are you stuck anywhere?\n\n"
+                + "⏰ Default time: **09:30 AM**\n\n"
+                + "You can customize questions and time anytime here:\n" + setupUrl;
+
+        TextChannel systemChannel = guild.getSystemChannel();
+        if (systemChannel != null && systemChannel.canTalk()) {
+            systemChannel.sendMessage(message).queue();
+        } else {
+            guild.retrieveOwner().queue(owner -> {
+                if (owner != null) {
+                    owner.getUser().openPrivateChannel()
+                            .flatMap(channel -> channel.sendMessage(message))
+                            .queue();
+                }
+            });
         }
     }
 

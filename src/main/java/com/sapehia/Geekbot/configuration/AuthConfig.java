@@ -42,9 +42,4 @@ public class AuthConfig {
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> discordOAuth2UserService(RestTemplateBuilder restTemplateBuilder) {
         return new DiscordOAuth2UserService(restTemplateBuilder.build());
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

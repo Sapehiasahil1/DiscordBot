@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 { color: #2d3748; }
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+<h1>Manage Server: <span th:text="${serverId}"></span></h1>
+
+<div class="button-container">
+    <a th:href="@{'/attendance/' + ${serverId}}" class="btn">📋 Attendance</a>
+
+    <a th:href="@{'/server/' + ${serverId} + '/configuration'}" class="btn">⚙️ Configuration</a>
+</div>
+</body>
+</html>

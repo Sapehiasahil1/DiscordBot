@@ -385,7 +385,7 @@
             <div class="servers-grid" th:if="${guilds != null and !#lists.isEmpty(guilds)}">
                 <!-- Only show servers where user is admin/owner -->
                 <div th:each="guild : ${guilds}" th:if="${guild.isAdminOrOwner}">
-                    <a href="#" class="server-card" th:href="@{'/attendance/' + ${guild.id}}"
+                    <a href="#" class="server-card" th:href="@{'/server/' + ${guild.id}}"
                        >
                         <div class="server-header">
                             <div class="server-icon" th:text="${#strings.substring(guild.name, 0, 1).toUpperCase()}">S</div>

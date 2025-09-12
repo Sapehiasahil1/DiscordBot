@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 50px;
+        }
+        h1 { color: #2d3748; text-align: center; }
+        form {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input[type="text"], input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-top: 8px;
+        }
+        .questions { margin-top: 20px; }
+        .question-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .question-row input {
+            flex: 1;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #e53e3e;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Configure Server: <span th:text="${serverId}"></span></h1>
+
+<form th:action="@{'/server/' + ${serverId} + '/configuration'}"
+      th:object="${serverConfigForm}"
+      method="post">
+
+    <!-- Time selection -->
+    <label for="sendTime">⏰ Select Time to Send Questions</label>
+    <input type="time" id="sendTime" th:field="*{sendTime}"/>
+
+    <div class="questions">
+        <label>📋 Questions</label>
+        <div id="questions-container">
+            <div class="question-row" th:each="q, iterStat : *{questions}">
+                <input type="text" th:field="*{questions[__${iterStat.index}__]}" placeholder="Enter a question"/>
+                <button type="button" class="btn btn-danger" onclick="removeQuestion(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" class="btn" onclick="addQuestion()">➕ Add Question</button>
+    </div>
+
+    <div class="actions">
+        <a th:href="@{'/server/' + ${serverId}}" class="btn btn-danger">⬅ Back</a>
+        <button type="submit" class="btn">💾 Save Configuration</button>
+    </div>
+</form>
+
+<script>
+    function addQuestion() {
+        const container = document.getElementById("questions-container");
+        const index = container.children.length;
+        const div = document.createElement("div");
+        div.className = "question-row";
+        div.innerHTML = `
+            <input type="text" name="questions[${index}]" placeholder="Enter a question"/>
+            <button type="button" class="btn btn-danger" onclick="removeQuestion(this)">Remove</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeQuestion(button) {
+        button.parentElement.remove();
+    }
+</script>
+</body>
+</html>

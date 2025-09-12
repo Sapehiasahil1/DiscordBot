@@ -1,6 +1,7 @@
 package com.sapehia.Geekbot.controller;
 
 import com.sapehia.Geekbot.model.Question;
+import com.sapehia.Geekbot.model.Server;
 import com.sapehia.Geekbot.model.ServerConfigForm;
 import com.sapehia.Geekbot.service.ServerService;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,9 @@ public class ServerController {
 
     @GetMapping("/{serverId}")
     public String serverHome(@PathVariable String serverId, Model model) {
+        Server server = serverService.getServerById(serverId);
+
+        model.addAttribute("serverName", server.getServerName());
         model.addAttribute("serverId", serverId);
         return "server-home";
     }
@@ -30,6 +34,8 @@ public class ServerController {
     @GetMapping("/{serverId}/configuration")
     public String serverConfig(@PathVariable String serverId, Model model) {
         List<Question> defaultQuestions = serverService.getQuestionFromServer(serverId);
+
+        Server server = serverService.getServerById(serverId);
 
         ServerConfigForm form = new ServerConfigForm();
         form.setSendTime(LocalTime.of(9, 30));
@@ -39,6 +45,7 @@ public class ServerController {
                         .toList()
         );
 
+        model.addAttribute("serverName", server.getServerName());
         model.addAttribute("serverId", serverId);
         model.addAttribute("serverConfigForm", form);
         return "server-config";
@@ -51,6 +58,7 @@ public class ServerController {
 
         serverService.saveServerConfig(serverId, form.getSendTime(), form.getQuestions());
 
+        redirectAttributes.addAttribute("serverName", serverService.getServerById(serverId).getServerName());
         redirectAttributes.addAttribute("serverId", serverId);
         redirectAttributes.addFlashAttribute("success", true);
 

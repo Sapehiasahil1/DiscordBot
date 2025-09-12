@@ -64,7 +64,7 @@
     </style>
 </head>
 <body>
-<h1>Configure Server: <span th:text="${serverId}"></span></h1>
+<h1>Configure Server: <span th:text="${serverName}"></span></h1>
 
 <form th:action="@{'/server/' + ${serverId} + '/configuration'}"
       th:object="${serverConfigForm}"

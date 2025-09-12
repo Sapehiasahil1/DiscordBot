@@ -349,7 +349,7 @@
                 <li><a href="#" th:href="@{/pricing}">Pricing</a></li>
             </ul>
             <div class="nav-buttons">
-                <a href="#" class="btn-secondary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
+                <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot" class="btn-secondary" sec:authorize="isAuthenticated()">Invite Bot</a>
                 <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
                     <button type="submit" class="btn-primary">Logout</button>
                 </form>

@@ -31,7 +31,6 @@ public class ServerController {
     public String serverConfig(@PathVariable String serverId, Model model) {
         List<Question> defaultQuestions = serverService.getQuestionFromServer(serverId);
 
-        // Create form object
         ServerConfigForm form = new ServerConfigForm();
         form.setSendTime(LocalTime.of(9, 30));
         form.setQuestions(

@@ -262,7 +262,7 @@ public class DiscordBotService extends ListenerAdapter {
     }
 
     private void sendSetupInstructions(Guild guild, Server server) {
-        String setupUrl = "http://localhost:8080/server/"+ server.getServerId() +"/configuration";
+        String setupUrl = "https://discordbot-fdr5.onrender.com/"+ server.getServerId() +"/configuration";
 
         String message = "👋 Thanks for adding me to **" + guild.getName() + "**!\n\n"
                 + "✅ Default daily check-in questions have been set:\n"

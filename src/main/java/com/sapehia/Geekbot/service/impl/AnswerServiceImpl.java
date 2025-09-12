@@ -57,4 +57,15 @@ public class AnswerServiceImpl implements AnswerService{
         LocalDateTime endOfDay = startOfDay.plusDays(1);
         return answerRepository.findBySubmittedDate(startOfDay, endOfDay);
     }
+
+    @Override
+    public List<Answer> getAnswersByDateRange(String serverId, LocalDate startDate, LocalDate endDate) {
+        return answerRepository
+                .findByAssignmentServerServerIdAndAssignmentDateBetween(serverId, startDate, endDate);
+    }
+
+    @Override
+    public int getRespondedDaysCount(String serverId, String memberId, LocalDate startDate, LocalDate endDate) {
+        return answerRepository.countDistinctDaysByMemberAndServerAndDateBetween(memberId, serverId, startDate, endDate);
+    }
 }

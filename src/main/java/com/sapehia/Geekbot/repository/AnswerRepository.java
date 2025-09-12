@@ -44,4 +44,18 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
                                  @Param("memberId") String memberId,
                                  @Param("start") LocalDateTime start,
                                  @Param("end") LocalDateTime end);
+
+    @Query("SELECT a FROM Answer a WHERE a.assignment.server.serverId = :serverId AND a.assignment.date BETWEEN :startDate AND :endDate")
+    List<Answer> findByAssignmentServerServerIdAndAssignmentDateBetween(
+            @Param("serverId") String serverId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT COUNT(DISTINCT qa.date) FROM Answer a JOIN a.assignment qa WHERE a.member.discordUserId = :memberId AND qa.server.serverId = :serverId AND qa.date BETWEEN :startDate AND :endDate")
+    int countDistinctDaysByMemberAndServerAndDateBetween(
+            @Param("memberId") String memberId,
+            @Param("serverId") String serverId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
 }

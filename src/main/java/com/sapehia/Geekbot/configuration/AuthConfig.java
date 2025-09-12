@@ -13,16 +13,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import com.sapehia.Geekbot.service.impl.CustomUserDetailsService;
 
 @Configuration
 public class AuthConfig {
-
-    private final CustomUserDetailsService userDetailsService;
-
-    public AuthConfig(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,17 +36,6 @@ public class AuthConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder encoder) throws Exception {
-        AuthenticationManagerBuilder authBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        authBuilder.userDetailsService(userDetailsService)
-                .passwordEncoder(encoder);
-
-        return authBuilder.build();
     }
 
     @Bean

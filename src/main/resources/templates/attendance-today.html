@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today's Attendance</title>
+    <title>Attendance Report</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -26,8 +26,125 @@
             padding: 30px;
             text-align: center;
         }
-        .header h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 700; }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
         .header p { font-size: 1.1rem; opacity: 0.9; }
+        .header .date-range {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #f8fafc;
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        .filter-group.search {
+            flex: 1;
+            min-width: 250px;
+        }
+        .filter-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filter-input {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #374151;
+            transform: translateY(-1px);
+        }
+        .btn-accent {
+            background: #10b981;
+            color: white;
+        }
+        .btn-accent:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .filter-tag {
+            background: #4f46e5;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
         .stats {
             display: flex;
             justify-content: space-around;
@@ -41,6 +158,7 @@
         .stat-number.responded { color: #10b981; }
         .stat-number.not-responded { color: #ef4444; }
         .stat-label { font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
         .attendance-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .attendance-table th {
             background: #f1f5f9; color: #334155; font-weight: 600;
@@ -52,6 +170,9 @@
         }
         .attendance-table tr:hover {
             background: #f8fafc; transform: translateY(-1px); transition: all 0.2s ease;
+        }
+        .attendance-table tr.hidden {
+            display: none;
         }
         .member-name {
             color: #4f46e5; text-decoration: none; font-weight: 500; font-size: 1rem;
@@ -69,6 +190,41 @@
         .status-responded { background: #d1fae5; color: #065f46; }
         .status-not-responded { background: #fee2e2; color: #991b1b; }
         .no-data { text-align: center; padding: 40px; color: #64748b; font-style: italic; }
+
+        /* Attendance ratio styling */
+        .attendance-ratio {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .attendance-percentage {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .high-attendance { background: #d1fae5; color: #065f46; }
+        .medium-attendance { background: #fef3c7; color: #92400e; }
+        .low-attendance { background: #fee2e2; color: #991b1b; }
+
+        /* Progress bar styling */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-high { background: #10b981; }
+        .progress-medium { background: #f59e0b; }
+        .progress-low { background: #ef4444; }
 
         /* Modal Styles */
         .modal {
@@ -89,7 +245,7 @@
             transform: translate(-50%, -50%);
             background: white;
             border-radius: 15px;
-            max-width: 600px;
+            max-width: 800px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -112,16 +268,21 @@
         .modal-body {
             padding: 20px;
         }
-        .question-item {
-            margin-bottom: 20px;
+        .day-item {
+            margin-bottom: 15px;
             padding: 15px;
             background: #f8fafc;
             border-radius: 10px;
             border-left: 4px solid #4f46e5;
         }
-        .question-text {
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
             font-weight: 600;
             color: #334155;
+        }
+        .question-text {
             margin-bottom: 8px;
             font-size: 0.95rem;
         }
@@ -146,82 +307,128 @@
             text-align: right;
             border-top: 1px solid #e2e8f0;
         }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .btn-primary {
-            background: #4f46e5;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #4338ca;
-            transform: translateY(-1px);
-        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                min-width: unset;
+            }
+            .filter-buttons {
+                justify-content: center;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>Today's Attendance</h1>
+        <h1 id="pageTitle">Attendance Report</h1>
         <p th:text="'Server: ' + ${serverName}">Server Name</p>
+        <div class="date-range" id="dateRangeDisplay" style="display: none;"></div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form th:action="@{/attendance/{serverId}(serverId=${serverId})}" method="get" id="filterForm">
+            <div class="filter-row">
+                <div class="filter-group search">
+                    <label for="searchUser">Search Member</label>
+                    <input type="text"
+                           id="searchUser"
+                           class="filter-input"
+                           placeholder="Enter member name..."
+                           autocomplete="off">
+                </div>
+                <div class="filter-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date"
+                           id="startDate"
+                           name="startDate"
+                           class="filter-input"
+                           th:value="${startDate}">
+                </div>
+                <div class="filter-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date"
+                           id="endDate"
+                           name="endDate"
+                           class="filter-input"
+                           th:value="${endDate}">
+                </div>
+                <div class="filter-buttons">
+                    <button type="button" class="btn btn-accent" onclick="setLast30Days()">Last 30 Days</button>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear All</button>
+                </div>
+            </div>
+        </form>
+        <div class="active-filters" id="activeFilters"></div>
     </div>
 
     <div class="stats">
         <div class="stat-item">
-            <div class="stat-number total" th:text="${members.size()}">0</div>
+            <div class="stat-number total" id="totalCount" th:text="${totalMembers}">0</div>
             <div class="stat-label">Total Members</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number responded" th:text="${answers.size()}">0</div>
-            <div class="stat-label">Responded</div>
+            <div class="stat-number total" id="totalDays" th:text="${totalDays}">0</div>
+            <div class="stat-label">Total Days</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number not-responded" th:text="${members.size() - answers.size()}">0</div>
-            <div class="stat-label">Not Responded</div>
+            <div class="stat-number total" id="avgAttendance" th:text="${#numbers.formatDecimal(avgAttendance, 1, 1)} + '%'">0%</div>
+            <div class="stat-label">Avg. Attendance</div>
         </div>
     </div>
 
-    <div th:if="${members.size() > 0}">
+    <div th:if="${memberAttendance.size() > 0}">
         <table class="attendance-table">
             <thead>
             <tr>
                 <th>Member Name</th>
-                <th>Status</th>
+                <th>Attendance</th>
+                <th>Response Rate</th>
             </tr>
             </thead>
-            <tbody>
-            <tr th:each="member : ${members}">
+            <tbody id="attendanceTableBody">
+            <tr th:each="attendance : ${memberAttendance}" class="member-row">
                 <td>
                     <span class="member-name"
-                          th:text="${member.username}"
-                          th:data-user-id="${member.discordUserId}"
-                          th:data-username="${member.username}">
+                          th:text="${attendance.member.username}"
+                          th:data-user-id="${attendance.member.discordUserId}"
+                          th:data-username="${attendance.member.username}">
                         Member Name
                     </span>
                 </td>
                 <td>
-                    <span class="status-badge"
-                          th:classappend="${answers.contains(member)} ? 'status-responded' : 'status-not-responded'"
-                          th:text="${answers.contains(member)} ? 'Responded' : 'Not Responded'">
-                        Status
-                    </span>
+                    <span class="attendance-ratio" th:text="${attendance.respondedDays} + '/' + ${attendance.totalDays}"></span>
+                    <div class="progress-container">
+                        <div class="progress-bar" th:classappend="${attendance.percentage >= 70} ? 'progress-high' : (${attendance.percentage >= 40} ? 'progress-medium' : 'progress-low')"
+                             th:style="'width: ' + ${attendance.percentage} + '%;'"></div>
+                    </div>
+                </td>
+                <td>
+                    <span class="attendance-percentage" th:classappend="${attendance.percentage >= 70} ? 'high-attendance' : (${attendance.percentage >= 40} ? 'medium-attendance' : 'low-attendance')"
+                          th:text="${#numbers.formatDecimal(attendance.percentage, 1, 1)} + '%'">0%</span>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
 
-    <div th:if="${members.size() == 0}" class="no-data">
-        <p>No members found for this server.</p>
+    <div th:if="${memberAttendance.size() == 0}" class="no-data" id="noDataMessage">
+        <p>No attendance data found for this server.</p>
+    </div>
+
+    <div class="no-data" id="noFilterResults" style="display: none;">
+        <p>No members match the current filters.</p>
     </div>
 </div>
 
@@ -230,10 +437,10 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalMemberName">Member Details</h3>
-            <p>Today's Questions and Responses</p>
+            <p>Daily Responses</p>
         </div>
         <div class="modal-body" id="modalBody">
-            <!-- Questions and answers will be populated here -->
+            <!-- Daily responses will be populated here -->
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" onclick="closeMemberModal()">Close</button>
@@ -241,25 +448,22 @@
     </div>
 </div>
 
-<!-- Hidden data for JavaScript -->
-<div id="questionsData" style="display: none;">
-    <div th:each="question : ${questions}"
-         th:attr="data-id=${question.id}, data-text=${question.text}">
-    </div>
-</div>
-
-<div id="memberAnswersData" style="display: none;">
-    <div th:each="member : ${members}"
-         th:attr="data-user-id=${member.discordUserId}, data-username=${member.username}">
-        <div th:each="answer : ${member.answers}"
-             th:if="${answer.assignment != null and answer.assignment.question != null}"
-             th:attr="data-question-id=${answer.assignment.question.id}, data-response=${answer.response}">
-        </div>
-    </div>
-</div>
-
 <script>
+    let currentFilters = {
+        search: '',
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
+        initializeEventListeners();
+        updateDateRangeDisplay();
+        updatePageTitle();
+        updateActiveFilters();
+    });
+
+    function initializeEventListeners() {
+        // Member name click events
         const memberNames = document.querySelectorAll('.member-name');
         memberNames.forEach(function(element) {
             element.addEventListener('click', function() {
@@ -268,55 +472,223 @@
                 showMemberDetails(userId, username);
             });
         });
-    });
+
+        // Search input event
+        document.getElementById('searchUser').addEventListener('input', function() {
+            filterMembers();
+        });
+    }
+
+    function setLast30Days() {
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
+        document.getElementById('endDate').value = formatDate(today);
+
+        // Submit the form to apply the date filter
+        document.getElementById('filterForm').submit();
+    }
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function clearFilters() {
+        document.getElementById('searchUser').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+
+        // Submit the form to clear all filters
+        document.getElementById('filterForm').submit();
+    }
+
+    function filterMembers() {
+        const searchTerm = document.getElementById('searchUser').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.member-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const memberName = row.querySelector('.member-name').textContent.toLowerCase();
+            const matchesSearch = !searchTerm || memberName.includes(searchTerm);
+
+            if (matchesSearch) {
+                row.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+
+        updateStats();
+        toggleNoResultsMessage(visibleCount === 0);
+    }
+
+    function updateStats() {
+        const visibleRows = document.querySelectorAll('.member-row:not(.hidden)');
+        document.getElementById('totalCount').textContent = visibleRows.length;
+    }
+
+    function updatePageTitle() {
+        const hasDateFilter = currentFilters.startDate || currentFilters.endDate;
+        const hasSearchFilter = currentFilters.search;
+
+        let title = "Attendance Report";
+
+        if (hasSearchFilter && hasDateFilter) {
+            title = "Filtered Attendance Report";
+        } else if (hasSearchFilter) {
+            title = "Member Search Results";
+        } else if (hasDateFilter) {
+            if (isLast30Days()) {
+                title = "Last 30 Days Attendance";
+            } else {
+                title = "Date Range Attendance";
+            }
+        } else {
+            title = "Attendance Report";
+        }
+
+        document.getElementById('pageTitle').textContent = title;
+    }
+
+    function isLast30Days() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) return false;
+
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        return startDate === formatDate(thirtyDaysAgo) && endDate === formatDate(today);
+    }
+
+    function updateDateRangeDisplay() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const dateRangeDisplay = document.getElementById('dateRangeDisplay');
+
+        if (startDate && endDate) {
+            const start = new Date(startDate).toLocaleDateString();
+            const end = new Date(endDate).toLocaleDateString();
+            dateRangeDisplay.textContent = `${start} - ${end}`;
+            dateRangeDisplay.style.display = 'block';
+        } else if (startDate) {
+            dateRangeDisplay.textContent = `From: ${new Date(startDate).toLocaleDateString()}`;
+            dateRangeDisplay.style.display = 'block';
+        } else if (endDate) {
+            dateRangeDisplay.textContent = `Until: ${new Date(endDate).toLocaleDateString()}`;
+            dateRangeDisplay.style.display = 'block';
+        } else {
+            dateRangeDisplay.style.display = 'none';
+        }
+    }
+
+    function updateActiveFilters() {
+        const activeFiltersContainer = document.getElementById('activeFilters');
+        activeFiltersContainer.innerHTML = '';
+
+        if (currentFilters.search) {
+            addFilterTag(`Search: ${currentFilters.search}`, 'search');
+        }
+
+        if (currentFilters.startDate && currentFilters.endDate) {
+            if (isLast30Days()) {
+                addFilterTag('Last 30 Days', 'dateRange');
+            } else {
+                const start = new Date(currentFilters.startDate).toLocaleDateString();
+                const end = new Date(currentFilters.endDate).toLocaleDateString();
+                addFilterTag(`${start} - ${end}`, 'dateRange');
+            }
+        } else if (currentFilters.startDate) {
+            addFilterTag(`From: ${new Date(currentFilters.startDate).toLocaleDateString()}`, 'startDate');
+        } else if (currentFilters.endDate) {
+            addFilterTag(`Until: ${new Date(currentFilters.endDate).toLocaleDateString()}`, 'endDate');
+        }
+    }
+
+    function addFilterTag(text, type) {
+        const activeFiltersContainer = document.getElementById('activeFilters');
+        const tag = document.createElement('div');
+        tag.className = 'filter-tag';
+        tag.innerHTML = `${text} <span class="remove" onclick="removeFilter('${type}')">&times;</span>`;
+        activeFiltersContainer.appendChild(tag);
+    }
+
+    function removeFilter(type) {
+        switch(type) {
+            case 'search':
+                document.getElementById('searchUser').value = '';
+                currentFilters.search = '';
+                filterMembers();
+                break;
+            case 'startDate':
+            case 'endDate':
+            case 'dateRange':
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                currentFilters.startDate = '';
+                currentFilters.endDate = '';
+                document.getElementById('filterForm').submit();
+                break;
+        }
+
+        updatePageTitle();
+        updateActiveFilters();
+        updateDateRangeDisplay();
+    }
+
+    function toggleNoResultsMessage(show) {
+        const noResults = document.getElementById('noFilterResults');
+        const table = document.querySelector('.attendance-table').parentElement;
+        const noData = document.getElementById('noDataMessage');
+
+        if (show && noData.style.display !== 'block') {
+            noResults.style.display = 'block';
+            table.style.display = 'none';
+        } else {
+            noResults.style.display = 'none';
+            table.style.display = 'block';
+        }
+    }
 
     function showMemberDetails(userId, username) {
         document.getElementById('modalMemberName').textContent = username;
 
-        // Get questions data from hidden div
-        const questionsContainer = document.getElementById('questionsData');
-        const questions = Array.from(questionsContainer.children).map(div => ({
-            id: div.getAttribute('data-id'),
-            text: div.getAttribute('data-text')
-        }));
-
-        // Get member answers data from hidden div
-        const memberAnswersContainer = document.getElementById('memberAnswersData');
-        const memberDiv = Array.from(memberAnswersContainer.children).find(div =>
-            div.getAttribute('data-user-id') === userId
-        );
-
-        let memberAnswers = [];
-        if (memberDiv) {
-            memberAnswers = Array.from(memberDiv.children).map(answerDiv => ({
-                questionId: answerDiv.getAttribute('data-question-id'),
-                response: answerDiv.getAttribute('data-response')
-            }));
-        }
-
-        let modalBodyHTML = '';
-
-        if (questions && questions.length > 0) {
-            questions.forEach(function(question) {
-                modalBodyHTML += `
-                    <div class="question-item">
-                        <div class="question-text">${escapeHtml(question.text)}</div>
-                `;
-
-                // Find if this member has answered this question
-                const memberAnswer = memberAnswers.find(answer => answer.questionId === question.id);
-
-                if (memberAnswer && memberAnswer.response) {
-                    modalBodyHTML += `<div class="answer-text">${escapeHtml(memberAnswer.response)}</div>`;
-                } else {
-                    modalBodyHTML += `<div class="no-answer">No response provided</div>`;
-                }
-
-                modalBodyHTML += `</div>`;
-            });
-        } else {
-            modalBodyHTML = '<div class="no-data"><p>No questions found for today.</p></div>';
-        }
+        // In a real implementation, you would fetch this data from the server
+        // For now, we'll simulate it with sample data
+        const modalBodyHTML = `
+            <div class="day-item">
+                <div class="day-header">
+                    <span>2023-10-15</span>
+                    <span class="status-responded">Responded</span>
+                </div>
+                <div class="question-text">What did you work on today?</div>
+                <div class="answer-text">Worked on the user authentication module and fixed some bugs.</div>
+            </div>
+            <div class="day-item">
+                <div class="day-header">
+                    <span>2023-10-14</span>
+                    <span class="status-responded">Responded</span>
+                </div>
+                <div class="question-text">Any blockers or challenges?</div>
+                <div class="answer-text">Facing issues with JWT token expiration.</div>
+            </div>
+            <div class="day-item">
+                <div class="day-header">
+                    <span>2023-10-13</span>
+                    <span class="status-not-responded">Not Responded</span>
+                </div>
+                <div class="question-text">What are your plans for tomorrow?</div>
+                <div class="no-answer">No response provided</div>
+            </div>
+        `;
 
         document.getElementById('modalBody').innerHTML = modalBodyHTML;
         document.getElementById('memberModal').style.display = 'block';
@@ -324,12 +696,6 @@
 
     function closeMemberModal() {
         document.getElementById('memberModal').style.display = 'none';
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Close modal when clicking outside

@@ -1,7 +1,5 @@
 package com.sapehia.Geekbot.controller;
 
-import com.sapehia.Geekbot.model.User;
-import com.sapehia.Geekbot.service.AuthService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -15,12 +13,6 @@ import java.util.Map;
 
 @Controller
 public class AuthController {
-
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @GetMapping("/index")
     public String home() {
@@ -53,11 +45,5 @@ public class AuthController {
         model.addAttribute("guilds", guilds);
         model.addAttribute("hasAdminGuilds", hasAdminGuilds);
         return "dashboard";
-    }
-
-    @PostMapping("/register")
-    public String register(@ModelAttribute User user){
-        authService.register(user);
-        return "index";
     }
 }

@@ -51,7 +51,6 @@ public class DiscordOAuth2UserService implements OAuth2UserService<OAuth2UserReq
                                 perms = ((Number) permObj).longValue();
                             }
                         } catch (NumberFormatException ignored) {
-                            // Handle parsing errors silently
                         }
                     }
 

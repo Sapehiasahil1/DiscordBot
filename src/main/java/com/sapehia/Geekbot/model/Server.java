@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class Server {
@@ -18,7 +16,7 @@ public class Server {
 
     private LocalTime questionTime;
 
-    @ManyToMany(mappedBy = "servers")
+    @ManyToMany(mappedBy = "servers", fetch = FetchType.EAGER)
     private List<Member> serverMembers = new ArrayList<>();
 
 

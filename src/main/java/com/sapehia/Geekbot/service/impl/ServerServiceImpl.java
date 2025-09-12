@@ -66,10 +66,6 @@ public class ServerServiceImpl implements ServerService {
         Server server = serverRepository.findById(guildId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 
-//        if (server.getServerMembers() == null) {
-//            server.setServerMembers(new ArrayList<>());
-//        }
-
         server.getServerMembers().add(memberEntity);
         memberEntity.getServers().add(server);
 

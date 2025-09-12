@@ -72,29 +72,22 @@ public class DiscordBotService extends ListenerAdapter {
         serverEntity.setServerName(guild.getName());
         serverEntity.setQuestionTime(LocalTime.of(9, 30));
 
-
         final Server savedServer = serverService.addServer(serverEntity);
+        createDefaultQuestions(savedServer);
 
         guild.loadMembers().onSuccess(members -> {
             for (Member member : members) {
                 if (member.getUser().isBot()) continue;
 
-                com.sapehia.Geekbot.model.Member memberEntity =
-                        memberService.getOrCreateMember(member.getId(), member.getUser().getName());
-
-                savedServer.getServerMembers().add(memberEntity);
-                memberEntity.getServers().add(savedServer);
-
-                memberService.addMember(memberEntity);
+                serverService.registerMemberToServer(
+                        guild.getId(),
+                        member.getId(),
+                        member.getUser().getName()
+                );
             }
-
-            serverService.addServer(savedServer);
-
-            createDefaultQuestions(savedServer);
             System.out.println("Stored new server: " + guild.getName());
         });
     }
-
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         Member discordMember = event.getMember();
@@ -241,6 +234,7 @@ public class DiscordBotService extends ListenerAdapter {
     }
 
     private void createDefaultQuestions(Server serverEntity) {
+
         List<String> defaultQuestions = List.of(
                 "What did you complete yesterday?",
                 "What are your plans for today?",
@@ -251,12 +245,14 @@ public class DiscordBotService extends ListenerAdapter {
             Question question = new Question();
             question.setText(text);
             question.setServer(serverEntity);
-            questionService.createQuestion(question);
+
+            Question savedQuestion = questionService.createQuestion(question);
 
             QuestionAssignment assignment = new QuestionAssignment();
             assignment.setServer(serverEntity);
-            assignment.setQuestion(question);
+            assignment.setQuestion(savedQuestion);
             assignment.setDate(LocalDate.now());
+
             questionAssignmentService.save(assignment);
         }
     }

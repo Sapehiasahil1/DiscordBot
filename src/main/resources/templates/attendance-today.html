@@ -333,7 +333,13 @@
         <h1 id="pageTitle">Attendance Report</h1>
         <p th:text="'Server: ' + ${serverName}">Server Name</p>
         <div class="date-range" id="dateRangeDisplay" style="display: none;"></div>
+
+        <!-- Back Button -->
+        <div style="margin-top: 15px;">
+            <a th:href="@{'/server/' + ${serverId}}" class="btn btn-secondary">⬅ Back to Server Home</a>
+        </div>
     </div>
+
 
     <!-- Filter Section -->
     <div class="filter-section">

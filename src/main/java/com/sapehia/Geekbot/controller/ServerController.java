@@ -6,7 +6,9 @@ import com.sapehia.Geekbot.service.ServerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,23 +29,34 @@ public class ServerController {
 
     @GetMapping("/{serverId}/configuration")
     public String serverConfig(@PathVariable String serverId, Model model) {
-        List<Question> defaultQuestions = serverService.getQuestionFromServer;
+        List<Question> defaultQuestions = serverService.getQuestionFromServer(serverId);
+
+        // Create form object
+        ServerConfigForm form = new ServerConfigForm();
+        form.setSendTime(LocalTime.of(9, 30));
+        form.setQuestions(
+                defaultQuestions.stream()
+                        .map(Question::getText)
+                        .toList()
+        );
 
         model.addAttribute("serverId", serverId);
-        model.addAttribute("questions", new ArrayList<>(defaultQuestions));
-        model.addAttribute("sendTime", "09:30");
+        model.addAttribute("serverConfigForm", form);
         return "server-config";
     }
 
     @PostMapping("/{serverId}/configuration")
     public String saveServerConfig(@PathVariable String serverId,
-                                   @ModelAttribute("configForm") ServerConfigForm form,
-                                   Model model) {
+                                   @ModelAttribute("serverConfigForm") ServerConfigForm form,
+                                   RedirectAttributes redirectAttributes) {
+
         serverService.saveServerConfig(serverId, form.getSendTime(), form.getQuestions());
 
-        model.addAttribute("serverId", serverId);
-        model.addAttribute("configForm", form);
-        model.addAttribute("success", true);
-        return "redirect:server-home";
+        redirectAttributes.addAttribute("serverId", serverId);
+        redirectAttributes.addFlashAttribute("success", true);
+
+        return "redirect:/server/" + serverId;
     }
+
+
 }

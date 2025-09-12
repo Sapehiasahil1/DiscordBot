@@ -1,17 +1,18 @@
 package com.sapehia.Geekbot.model;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServerConfigForm {
-    private String sendTime;
+    private LocalTime sendTime;
     private List<String> questions = new ArrayList<>();
 
-    public String getSendTime() {
+    public LocalTime getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(String sendTime) {
+    public void setSendTime(LocalTime sendTime) {
         this.sendTime = sendTime;
     }
 

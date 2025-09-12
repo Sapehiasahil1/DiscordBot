@@ -14,7 +14,7 @@ import java.util.Map;
 @Controller
 public class AuthController {
 
-    @GetMapping("/index")
+    @GetMapping("/")
     public String home() {
         return "index";
     }

@@ -20,7 +20,7 @@ public class Server {
     private List<Member> serverMembers = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 
     public Server() {

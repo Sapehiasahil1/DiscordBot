@@ -1,11 +1,7 @@
 package com.sapehia.Geekbot.service.impl;
 
-import com.sapehia.Geekbot.model.Answer;
-import com.sapehia.Geekbot.model.Member;
-import com.sapehia.Geekbot.model.Server;
-import com.sapehia.Geekbot.repository.AnswerRepository;
-import com.sapehia.Geekbot.repository.MemberRepository;
-import com.sapehia.Geekbot.repository.ServerRepository;
+import com.sapehia.Geekbot.model.*;
+import com.sapehia.Geekbot.repository.*;
 import com.sapehia.Geekbot.service.AnswerService;
 import com.sapehia.Geekbot.service.ServerService;
 import jakarta.transaction.Transactional;
@@ -13,6 +9,7 @@ import net.dv8tion.jda.api.JDA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,13 +22,21 @@ public class ServerServiceImpl implements ServerService {
     private final ServerRepository serverRepository;
     private final MemberRepository memberRepository;
     private final AnswerService answerService;
+    private final QuestionRepository questionRepository;
+    private final QuestionAssignmentRepository questionAssignmentRepository;
 
     private JDA jda;
 
-    public ServerServiceImpl(ServerRepository serverRepository, MemberRepository memberRepository, AnswerService answerService) {
+    public ServerServiceImpl(ServerRepository serverRepository,
+                             MemberRepository memberRepository,
+                             AnswerService answerService,
+                             QuestionRepository questionRepository,
+                             QuestionAssignmentRepository questionAssignmentRepository) {
         this.serverRepository = serverRepository;
         this.memberRepository = memberRepository;
         this.answerService = answerService;
+        this.questionRepository = questionRepository;
+        this.questionAssignmentRepository = questionAssignmentRepository;
     }
 
     @Autowired
@@ -112,4 +117,35 @@ public class ServerServiceImpl implements ServerService {
         }
         return uniqueMembers;
     }
+
+    @Override
+    public List<Question> getQuestionFromServer(String serverId) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(()-> new RuntimeException("Server not found with id " + serverId));
+
+        return server.getQuestions();
+    }
+
+    @Override
+    @Transactional
+    public void saveServerConfig(String serverId, LocalTime sendTime, List<String> questions) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
+
+        server.setQuestionTime(sendTime);
+
+        server.getQuestions().clear();
+
+        for (String qText : questions) {
+            if (qText == null || qText.isBlank()) continue;
+
+            Question q = new Question();
+            q.setText(qText);
+            q.setServer(server);
+            server.getQuestions().add(q);
+        }
+
+        serverRepository.save(server);
+    }
+
 }

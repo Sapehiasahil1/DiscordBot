@@ -19,7 +19,7 @@ public class Question {
     @JoinColumn(name = "server_id")
     private Server server;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionAssignment> assignments = new ArrayList<>();
 
 

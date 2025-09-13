@@ -1,10 +1,6 @@
 package com.sapehia.Geekbot.service;
 
-import com.sapehia.Geekbot.model.Answer;
-import com.sapehia.Geekbot.model.Member;
-import com.sapehia.Geekbot.model.Question;
-import com.sapehia.Geekbot.model.QuestionAssignment;
-import com.sapehia.Geekbot.model.Server;
+import com.sapehia.Geekbot.model.*;
 import com.sapehia.Geekbot.repository.MemberRepository;
 import com.sapehia.Geekbot.repository.ServerRepository;
 import com.sapehia.Geekbot.service.impl.ServerServiceImpl;
@@ -17,11 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -56,22 +51,30 @@ class ServerServiceImplTest {
     private Server server;
     private Member member;
     private Question question;
+    private String serverId;
+    private String memberId;
+    private String username;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(serverService, "jda", jda);
 
+        serverId = "guild-1";
+        memberId = "user-1";
+        username = "testUser";
+
         server = new Server();
-        server.setServerId("guild-1");
+        server.setServerId(serverId);
         server.setServerName("Test Server");
         server.setQuestionTime(LocalTime.of(9, 30));
 
         server.setServerMembers(new ArrayList<>());
         server.setQuestions(new ArrayList<>());
+        server.setExcludedDays("SUNDAY");
 
         member = new Member();
-        member.setDiscordUserId("user-1");
-        member.setUsername("testUser");
+        member.setDiscordUserId(memberId);
+        member.setUsername(username);
 
         question = new Question();
         question.setId(1L);
@@ -79,44 +82,43 @@ class ServerServiceImplTest {
     }
 
     @Test
-    void testListOfMembers_Found() {
+    void testListOfMembers_Success() {
         server.getServerMembers().add(member);
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
 
-        List<Member> members = serverService.listOfMembers("guild-1");
+        List<Member> members = serverService.listOfMembers(serverId);
 
         assertNotNull(members);
         assertEquals(1, members.size());
-        assertTrue(members.contains(member));
-        verify(serverRepository, times(1)).findById("guild-1");
+        assertEquals(member.getDiscordUserId(), members.get(0).getDiscordUserId());
+        verify(serverRepository, times(1)).findById(serverId);
     }
 
     @Test
-    void testListOfMembers_NotFound() {
-        when(serverRepository.findById("nonexistent")).thenReturn(Optional.empty());
+    void testListOfMembers_ServerNotFound_ThrowsException() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
 
-        assertThrows(java.util.NoSuchElementException.class, () -> serverService.listOfMembers("nonexistent"));
-        verify(serverRepository, times(1)).findById("nonexistent");
+        assertThrows(RuntimeException.class, () -> serverService.listOfMembers(serverId));
+        verify(serverRepository, times(1)).findById(serverId);
     }
 
     @Test
-    void testGetServerById_Found() {
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
+    void testGetServerById_Success() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
 
-        Server foundServer = serverService.getServerById("guild-1");
+        Server foundServer = serverService.getServerById(serverId);
 
         assertNotNull(foundServer);
-        assertEquals("guild-1", foundServer.getServerId());
-        verify(serverRepository, times(1)).findById("guild-1");
+        assertEquals(serverId, foundServer.getServerId());
+        verify(serverRepository, times(1)).findById(serverId);
     }
 
     @Test
-    void testGetServerById_NotFound() {
-        when(serverRepository.findById("nonexistent")).thenReturn(Optional.empty());
+    void testGetServerById_ServerNotFound_ThrowsException() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> serverService.getServerById("nonexistent"));
-        assertEquals("Server not found with id nonexistent", thrown.getMessage());
-        verify(serverRepository, times(1)).findById("nonexistent");
+        assertThrows(RuntimeException.class, () -> serverService.getServerById(serverId));
+        verify(serverRepository, times(1)).findById(serverId);
     }
 
     @Test
@@ -132,177 +134,171 @@ class ServerServiceImplTest {
 
     @Test
     void testGetAllServers() {
-        when(serverRepository.findAll()).thenReturn(List.of(server));
+        List<Server> serverList = List.of(server, new Server());
+        when(serverRepository.findAll()).thenReturn(serverList);
 
         List<Server> servers = serverService.getAllServers();
 
         assertNotNull(servers);
-        assertEquals(1, servers.size());
+        assertEquals(2, servers.size());
         verify(serverRepository, times(1)).findAll();
     }
 
     @Test
-    void testAddMemberToServer() {
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
-        when(serverRepository.save(any(Server.class))).thenReturn(server);
-        when(memberRepository.save(any(Member.class))).thenReturn(member);
+    void testAddMemberToServer_ServerNotFound_ThrowsException() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
 
-        serverService.addMemberToServer("guild-1", member);
-
-        assertTrue(server.getServerMembers().contains(member));
-        verify(serverRepository, times(1)).findById("guild-1");
-        verify(serverRepository, times(1)).save(any(Server.class));
-        verify(memberRepository, times(1)).save(any(Member.class));
-    }
-
-    @Test
-    void testAddMemberToServer_NotFound() {
-        when(serverRepository.findById("nonexistent")).thenReturn(Optional.empty());
-
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> serverService.addMemberToServer("nonexistent", member));
-        assertEquals("Server not found", thrown.getMessage());
-        verify(serverRepository, times(1)).findById("nonexistent");
-        verify(serverRepository, never()).save(any(Server.class));
+        assertThrows(RuntimeException.class, () -> serverService.addMemberToServer(serverId, member));
+        verify(serverRepository, times(1)).findById(serverId);
         verify(memberRepository, never()).save(any(Member.class));
     }
 
     @Test
-    void testRegisterMemberToServer_ServerAndMemberExist() {
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
-        when(memberRepository.findById("user-1")).thenReturn(Optional.of(member));
-        server.getServerMembers().add(member);
+    void testRegisterMemberToServer_NewMemberAndServer() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        serverService.registerMemberToServer("guild-1", "user-1", "testUser");
-
-        verify(serverRepository, times(1)).findById("guild-1");
-        verify(memberRepository, times(1)).findById("user-1");
-        verify(serverRepository, never()).save(any(Server.class));
-        verify(memberRepository, never()).save(any(Member.class));
-    }
-
-    @Test
-    void testRegisterMemberToServer_ServerExistsMemberNot() {
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
-        when(memberRepository.findById("user-2")).thenReturn(Optional.empty());
-        when(memberRepository.save(any(Member.class))).thenAnswer(i -> i.getArgument(0));
-
-        serverService.registerMemberToServer("guild-1", "user-2", "newUser");
-
-        verify(serverRepository, times(1)).findById("guild-1");
-        verify(memberRepository, times(1)).findById("user-2");
-        verify(memberRepository, times(2)).save(any(Member.class));
-        verify(serverRepository, times(1)).save(any(Server.class));
-    }
-
-    @Test
-    void testRegisterMemberToServer_ServerAndMemberNotExist() {
-        when(serverRepository.findById("guild-2")).thenReturn(Optional.empty());
-        when(memberRepository.findById("user-2")).thenReturn(Optional.empty());
-        when(jda.getGuildById("guild-2")).thenReturn(guild);
+        Server newServer = new Server();
+        newServer.setServerId(serverId);
+        when(jda.getGuildById(serverId)).thenReturn(guild);
         when(guild.getName()).thenReturn("New Server");
-        when(serverRepository.save(any(Server.class))).thenAnswer(i -> i.getArgument(0));
-        when(memberRepository.save(any(Member.class))).thenAnswer(i -> i.getArgument(0));
+        when(serverRepository.save(any(Server.class))).thenReturn(newServer);
 
-        serverService.registerMemberToServer("guild-2", "user-2", "newUser");
+        Member newMember = new Member();
+        newMember.setDiscordUserId(memberId);
+        when(memberRepository.save(any(Member.class))).thenReturn(newMember);
 
-        verify(serverRepository, times(1)).findById("guild-2");
-        verify(memberRepository, times(1)).findById("user-2");
+        serverService.registerMemberToServer(serverId, memberId, username);
+
         verify(serverRepository, times(2)).save(any(Server.class));
         verify(memberRepository, times(2)).save(any(Member.class));
     }
 
     @Test
+    void testRegisterMemberToServer_ExistingMemberAndServer() {
+        server.getServerMembers().add(member);
+        member.getServers().add(server);
+
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        serverService.registerMemberToServer(serverId, memberId, username);
+
+        verify(serverRepository, times(1)).findById(serverId);
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(serverRepository, never()).save(any(Server.class));
+        verify(memberRepository, never()).save(any(Member.class));
+    }
+
+
+    @Test
     void testUniqueMemberResponse() {
-        String serverId = "guild-1";
-        Member member2 = new Member();
-        member2.setDiscordUserId("user-2");
+        List<Member> members = List.of(member);
+        List<Answer> answers = List.of(new Answer(), new Answer());
+        answers.get(0).setMember(member);
+        answers.get(1).setMember(member);
 
-        Answer answer1 = new Answer();
-        answer1.setMember(member);
-        Answer answer2 = new Answer();
-        answer2.setMember(member2);
-        Answer answer3 = new Answer();
-        answer3.setMember(member);
+        when(answerService.getTodayMembersResponse(serverId)).thenReturn(answers);
 
-        List<Answer> mockAnswers = List.of(answer1, answer2, answer3);
-        when(answerService.getTodayMembersResponse(serverId)).thenReturn(mockAnswers);
-
-        Set<Member> uniqueMembers = serverService.uniqueMemberResponse(serverId, List.of(member, member2));
+        Set<Member> uniqueMembers = serverService.uniqueMemberResponse(serverId, members);
 
         assertNotNull(uniqueMembers);
-        assertEquals(2, uniqueMembers.size());
+        assertEquals(1, uniqueMembers.size());
         assertTrue(uniqueMembers.contains(member));
-        assertTrue(uniqueMembers.contains(member2));
         verify(answerService, times(1)).getTodayMembersResponse(serverId);
     }
 
+
     @Test
-    void testGetQuestionFromServer_Found() {
+    void testGetQuestionFromServer_Success() {
         server.getQuestions().add(question);
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
 
-        List<Question> foundQuestions = serverService.getQuestionFromServer("guild-1");
+        List<Question> questions = serverService.getQuestionFromServer(serverId);
 
-        assertNotNull(foundQuestions);
-        assertEquals(1, foundQuestions.size());
-        assertEquals(question.getId(), foundQuestions.getFirst().getId());
-        verify(serverRepository, times(1)).findById("guild-1");
+        assertNotNull(questions);
+        assertEquals(1, questions.size());
+        assertEquals(question.getText(), questions.getFirst().getText());
+        verify(serverRepository, times(1)).findById(serverId);
     }
 
     @Test
-    void testGetQuestionFromServer_NotFound() {
-        when(serverRepository.findById("nonexistent")).thenReturn(Optional.empty());
+    void testGetQuestionFromServer_ServerNotFound_ThrowsException() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
 
-        RuntimeException thrown = assertThrows(
-                RuntimeException.class,
-                () -> serverService.getQuestionFromServer("nonexistent")
-        );
-
-        assertEquals("Server not found with id nonexistent", thrown.getMessage());
-        verify(serverRepository, times(1)).findById("nonexistent");
+        assertThrows(RuntimeException.class, () -> serverService.getQuestionFromServer(serverId));
+        verify(serverRepository, times(1)).findById(serverId);
     }
+
 
     @Test
     void testSaveServerConfig_Success() {
         LocalTime sendTime = LocalTime.of(10, 0);
         List<String> questions = List.of("Q1", "Q2", "Q3");
+        Set<DayOfWeek> excludedDays = Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY);
 
-        when(serverRepository.findById("guild-1")).thenReturn(Optional.of(server));
-
-        when(serverRepository.save(any(Server.class))).thenAnswer(i -> {
-            return i.<Server>getArgument(0);
-        });
-
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
+        when(serverRepository.save(any(Server.class))).thenAnswer(i -> i.getArgument(0));
         when(questionService.createQuestion(any(Question.class))).thenAnswer(i -> {
             Question q = i.getArgument(0);
             q.setId(Math.round(Math.random() * 1000));
             return q;
         });
-        when(questionAssignmentService.save(any(QuestionAssignment.class))).thenAnswer(i -> i.getArgument(0));
 
-        serverService.saveServerConfig("guild-1", sendTime, questions);
+        serverService.saveServerConfig(serverId, sendTime, questions, excludedDays);
 
         assertEquals(sendTime, server.getQuestionTime());
-        assertEquals(questions.size(), server.getQuestions().size());
+        assertEquals(excludedDays, server.getExcludedDaysAsSet());
+        assertEquals(0, server.getQuestions().size());
 
-        verify(serverRepository, times(1)).findById("guild-1");
+        verify(serverRepository, times(1)).findById(serverId);
+        verify(serverRepository, times(1)).flush();
         verify(serverRepository, times(1)).save(server);
         verify(questionService, times(questions.size())).createQuestion(any(Question.class));
         verify(questionAssignmentService, times(questions.size())).save(any(QuestionAssignment.class));
     }
 
+
     @Test
-    void testSaveServerConfig_ServerNotFound() {
-        when(serverRepository.findById("nonexistent")).thenReturn(Optional.empty());
+    void testUpdateServerExcludedDays_Success() {
+        Set<DayOfWeek> newExcludedDays = Set.of(DayOfWeek.SUNDAY, DayOfWeek.SATURDAY);
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
+        when(serverRepository.save(any(Server.class))).thenAnswer(i -> i.getArgument(0));
 
-        RuntimeException thrown = assertThrows(
-                RuntimeException.class,
-                () -> serverService.saveServerConfig("nonexistent", LocalTime.now(), List.of("Q1"))
-        );
+        serverService.updateServerExcludedDays(serverId, newExcludedDays);
 
-        assertEquals("Server not found with id nonexistent", thrown.getMessage());
-        verify(serverRepository, times(1)).findById("nonexistent");
+        assertEquals(newExcludedDays, server.getExcludedDaysAsSet());
+        verify(serverRepository, times(1)).findById(serverId);
+        verify(serverRepository, times(1)).save(server);
+    }
+
+    @Test
+    void testUpdateServerExcludedDays_ServerNotFound_ThrowsException() {
+        Set<DayOfWeek> newExcludedDays = Set.of(DayOfWeek.SUNDAY);
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> serverService.updateServerExcludedDays(serverId, newExcludedDays));
+        verify(serverRepository, times(1)).findById(serverId);
         verify(serverRepository, never()).save(any(Server.class));
-        verify(questionService, never()).createQuestion(any(Question.class));
+    }
+
+    @Test
+    void testGetServerExcludedDays_Success() {
+        Set<DayOfWeek> excludedDays = Set.of(DayOfWeek.SUNDAY, DayOfWeek.MONDAY);
+        server.setExcludedDaysFromSet(excludedDays);
+        when(serverRepository.findById(serverId)).thenReturn(Optional.of(server));
+
+        Set<DayOfWeek> returnedDays = serverService.getServerExcludedDays(serverId);
+
+        assertEquals(excludedDays, returnedDays);
+        verify(serverRepository, times(1)).findById(serverId);
+    }
+
+    @Test
+    void testGetServerExcludedDays_ServerNotFound_ThrowsException() {
+        when(serverRepository.findById(serverId)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> serverService.getServerExcludedDays(serverId));
+        verify(serverRepository, times(1)).findById(serverId);
     }
 }

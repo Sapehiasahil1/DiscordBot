@@ -9,8 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Controller
@@ -34,20 +36,21 @@ public class ServerController {
     @GetMapping("/{serverId}/configuration")
     public String serverConfig(@PathVariable String serverId, Model model) {
         List<Question> defaultQuestions = serverService.getQuestionFromServer(serverId);
-
         Server server = serverService.getServerById(serverId);
 
         ServerConfigForm form = new ServerConfigForm();
-        form.setSendTime(LocalTime.of(9, 30));
+        form.setSendTime(server.getQuestionTime() != null ? server.getQuestionTime() : LocalTime.of(9, 30));
         form.setQuestions(
                 defaultQuestions.stream()
                         .map(Question::getText)
                         .toList()
         );
+        form.setExcludedDays(server.getExcludedDaysAsSet());
 
         model.addAttribute("serverName", server.getServerName());
         model.addAttribute("serverId", serverId);
         model.addAttribute("serverConfigForm", form);
+        model.addAttribute("allDays", Arrays.asList(DayOfWeek.values()));
         return "server-config";
     }
 
@@ -56,7 +59,11 @@ public class ServerController {
                                    @ModelAttribute("serverConfigForm") ServerConfigForm form,
                                    RedirectAttributes redirectAttributes) {
 
-        serverService.saveServerConfig(serverId, form.getSendTime(), form.getQuestions());
+        if (form.getExcludedDays() == null) {
+            form.setExcludedDays(new HashSet<>());
+        }
+
+        serverService.saveServerConfig(serverId, form.getSendTime(), form.getQuestions(), form.getExcludedDays());
 
         redirectAttributes.addAttribute("serverName", serverService.getServerById(serverId).getServerName());
         redirectAttributes.addAttribute("serverId", serverId);
@@ -64,6 +71,4 @@ public class ServerController {
 
         return "redirect:/server/" + serverId;
     }
-
-
 }

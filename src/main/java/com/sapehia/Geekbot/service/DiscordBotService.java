@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -133,8 +134,15 @@ public class DiscordBotService extends ListenerAdapter {
     public void sendDailyQuestions() {
         LocalTime now = LocalTime.now().withSecond(0).withNano(0);
         LocalDate today = LocalDate.now();
+        DayOfWeek currentDay = today.getDayOfWeek();
 
         for (Server server : serverService.getAllServers()) {
+            if (!server.shouldSendQuestionsOnDay(currentDay)) {
+                System.out.println("Skipping server " + server.getServerName() +
+                        " - " + currentDay + " is excluded");
+                continue;
+            }
+
             if (server.getQuestionTime() != null && server.getQuestionTime().equals(now)) {
                 Guild guild = jda.getGuildById(server.getServerId());
                 if (guild != null) {
@@ -220,6 +228,14 @@ public class DiscordBotService extends ListenerAdapter {
             QuestionAssignment assignment = questionAssignmentService
                     .getByServerIdAndQuestionIdAndAssignedDate(serverId, question.getId(), today);
 
+            if (assignment == null) {
+                assignment = new QuestionAssignment();
+                assignment.setServer(serverService.getServerById(serverId));
+                assignment.setQuestion(question);
+                assignment.setDate(today);
+                assignment = questionAssignmentService.save(assignment);
+            }
+
             Answer answer = new Answer();
             answer.setMember(memberEntity);
             answer.setAssignment(assignment);
@@ -238,39 +254,40 @@ public class DiscordBotService extends ListenerAdapter {
     }
 
     private void createDefaultQuestions(Server serverEntity) {
-
         List<String> defaultQuestions = List.of(
                 "What did you complete yesterday?",
                 "What are your plans for today?",
                 "Are you stuck anywhere?"
         );
 
-        for (String text : defaultQuestions) {
-            Question question = new Question();
-            question.setText(text);
-            question.setServer(serverEntity);
-
-            Question savedQuestion = questionService.createQuestion(question);
-
-            QuestionAssignment assignment = new QuestionAssignment();
-            assignment.setServer(serverEntity);
-            assignment.setQuestion(savedQuestion);
-            assignment.setDate(LocalDate.now());
-
-            questionAssignmentService.save(assignment);
-        }
+        serverService.saveServerConfig(
+                serverEntity.getServerId(),
+                LocalTime.of(9, 30),
+                defaultQuestions,
+                Set.of(DayOfWeek.SUNDAY)
+        );
     }
 
     private void sendSetupInstructions(Guild guild, Server server) {
         String setupUrl = "https://discordbot-fdr5.onrender.com/server/"+ server.getServerId() +"/configuration";
+
+        Set<DayOfWeek> excludedDaysSet = server.getExcludedDaysAsSet();
+        String excludedDaysText = excludedDaysSet.isEmpty() ?
+                "None (questions sent every day)" :
+                excludedDaysSet.stream()
+                        .map(day -> day.toString().toLowerCase())
+                        .map(day -> day.substring(0, 1).toUpperCase() + day.substring(1))
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("Sunday");
 
         String message = "👋 Thanks for adding me to **" + guild.getName() + "**!\n\n"
                 + "✅ Default daily check-in questions have been set:\n"
                 + "1. What did you complete yesterday?\n"
                 + "2. What are your plans for today?\n"
                 + "3. Are you stuck anywhere?\n\n"
-                + "⏰ Default time: **09:30 AM**\n\n"
-                + "You can customize questions and time anytime here:\n" + setupUrl;
+                + "⏰ Default time: **09:30 AM**\n"
+                + "🚫 Questions will not be sent on: **" + excludedDaysText + "**\n\n"
+                + "You can customize questions, time, and excluded days here:\n" + setupUrl;
 
         TextChannel systemChannel = guild.getSystemChannel();
         if (systemChannel != null && systemChannel.canTalk()) {

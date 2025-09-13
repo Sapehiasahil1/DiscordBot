@@ -2,9 +2,14 @@ package com.sapehia.Geekbot.model;
 
 import jakarta.persistence.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Server {
@@ -15,6 +20,8 @@ public class Server {
     private String serverName;
 
     private LocalTime questionTime;
+
+    private String excludedDays = "SUNDAY";
 
     @ManyToMany(mappedBy = "servers", fetch = FetchType.EAGER)
     private List<Member> serverMembers = new ArrayList<>();
@@ -32,6 +39,7 @@ public class Server {
         this.serverMembers = serverMembers;
         this.questionTime = questionTime;
         this.questions = questions;
+        this.excludedDays = "SUNDAY";
     }
 
     public String getServerId() {
@@ -72,5 +80,42 @@ public class Server {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public String getExcludedDays() {
+        return excludedDays;
+    }
+
+    public void setExcludedDays(String excludedDays) {
+        this.excludedDays = excludedDays;
+    }
+
+    public Set<DayOfWeek> getExcludedDaysAsSet() {
+        if (excludedDays == null || excludedDays.trim().isEmpty()) {
+            return Set.of();
+        }
+        return Arrays.stream(excludedDays.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(DayOfWeek::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    public void setExcludedDaysFromSet(Set<DayOfWeek> days) {
+        if (days == null || days.isEmpty()) {
+            this.excludedDays = "";
+        } else {
+            this.excludedDays = days.stream()
+                    .map(DayOfWeek::name)
+                    .collect(Collectors.joining(","));
+        }
+    }
+
+    public boolean shouldSendQuestionsToday() {
+        return !getExcludedDaysAsSet().contains(LocalDate.now().getDayOfWeek());
+    }
+
+    public boolean shouldSendQuestionsOnDay(DayOfWeek dayOfWeek) {
+        return !getExcludedDaysAsSet().contains(dayOfWeek);
     }
 }

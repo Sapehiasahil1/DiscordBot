@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.JDA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class ServerServiceImpl implements ServerService {
                     newServer.setServerId(guildId);
                     newServer.setServerName(jda.getGuildById(guildId).getName());
                     newServer.setQuestionTime(LocalTime.of(9, 30));
+                    newServer.setExcludedDays("SUNDAY"); // Set default excluded day
                     return serverRepository.save(newServer);
                 });
 
@@ -130,13 +132,16 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     @Transactional
-    public void saveServerConfig(String serverId, LocalTime sendTime, List<String> questions) {
+    public void saveServerConfig(String serverId, LocalTime sendTime, List<String> questions, Set<DayOfWeek> excludedDays) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
 
         server.setQuestionTime(sendTime);
 
+        server.setExcludedDaysFromSet(excludedDays != null ? excludedDays : Set.of(DayOfWeek.SUNDAY));
+
         server.getQuestions().clear();
+        serverRepository.flush();
 
         for (String qText : questions) {
             if (qText == null || qText.isBlank()) continue;
@@ -158,4 +163,21 @@ public class ServerServiceImpl implements ServerService {
         serverRepository.save(server);
     }
 
+    @Override
+    @Transactional
+    public void updateServerExcludedDays(String serverId, Set<DayOfWeek> excludedDays) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
+
+        server.setExcludedDaysFromSet(excludedDays);
+        serverRepository.save(server);
+    }
+
+    @Override
+    public Set<DayOfWeek> getServerExcludedDays(String serverId) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
+
+        return server.getExcludedDaysAsSet();
+    }
 }

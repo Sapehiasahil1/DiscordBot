@@ -2,111 +2,540 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Server Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Configuration - Geekbot</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fa;
-            padding: 50px;
-        }
-        h1 { color: #2d3748; text-align: center; }
-        form {
-            max-width: 600px;
-            margin: 30px auto;
-            background: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
         }
-        label { font-weight: bold; display: block; margin-top: 15px; }
-        input[type="text"], input[type="time"] {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-top: 8px;
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
-        .questions { margin-top: 20px; }
-        .question-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
         }
-        .question-row input {
-            flex: 1;
-        }
-        .btn {
-            background: #667eea;
+
+        .header h1 {
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-        .btn:hover {
-            background: #764ba2;
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+        }
+
+        .config-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             transform: translateY(-2px);
         }
+
+        .time-input {
+            max-width: 200px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            position: relative;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .checkbox-item.checked {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0;
+            text-align: center;
+        }
+
+        .help-text {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .questions-container {
+            margin-top: 20px;
+        }
+
+        .question-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .question-row:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .question-row input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 1rem;
+            background: transparent;
+        }
+
+        .question-row input:focus {
+            outline: none;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-3px);
+        }
+
         .btn-danger {
             background: #e53e3e;
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.9rem;
         }
+
         .btn-danger:hover {
             background: #c53030;
         }
-        .actions {
+
+        .btn-add {
+            background: #38a169;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-add:hover {
+            background: #2f855a;
+            transform: translateY(-3px);
+        }
+
+        .form-actions {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #38a169;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .question-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .question-number {
+                align-self: flex-start;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-<h1>Configure Server: <span th:text="${serverName}"></span></h1>
+<div class="container">
+    <div class="header fade-in">
+        <h1><i class="fas fa-robot"></i> Bot Configuration</h1>
+        <p>Customize your server's daily question settings</p>
+    </div>
 
-<form th:action="@{'/server/' + ${serverId} + '/configuration'}"
-      th:object="${serverConfigForm}"
-      method="post">
-
-    <!-- Time selection -->
-    <label for="sendTime">⏰ Select Time to Send Questions</label>
-    <input type="time" id="sendTime" th:field="*{sendTime}"/>
-
-    <div class="questions">
-        <label>📋 Questions</label>
-        <div id="questions-container">
-            <div class="question-row" th:each="q, iterStat : *{questions}">
-                <input type="text" th:field="*{questions[__${iterStat.index}__]}" placeholder="Enter a question"/>
-                <button type="button" class="btn btn-danger" onclick="removeQuestion(this)">Remove</button>
-            </div>
+    <div class="config-card fade-in">
+        <div class="card-header">
+            <h2>
+                <i class="fas fa-server"></i>
+                <span th:text="${serverName}">Server Name</span>
+            </h2>
+            <p>Configure when and how daily questions are sent to your team</p>
         </div>
-        <button type="button" class="btn" onclick="addQuestion()">➕ Add Question</button>
-    </div>
 
-    <div class="actions">
-        <a th:href="@{'/server/' + ${serverId}}" class="btn btn-danger">⬅ Back</a>
-        <button type="submit" class="btn">💾 Save Configuration</button>
+        <div class="card-body">
+            <form th:action="@{'/server/' + ${serverId} + '/configuration'}"
+                  th:object="${serverConfigForm}"
+                  method="post">
+
+                <!-- Time Configuration Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-clock"></i> Schedule Settings</h3>
+                    <div class="form-group">
+                        <label for="sendTime">What time should questions be sent?</label>
+                        <input type="time"
+                               id="sendTime"
+                               th:field="*{sendTime}"
+                               class="form-control time-input"/>
+                        <div class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Questions will be sent via direct message to all server members at this time daily.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Excluded Days Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-calendar-times"></i> Skip Days</h3>
+                    <label>Select days when questions should NOT be sent:</label>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item" th:each="day : ${allDays}" th:classappend="${#sets.contains(serverConfigForm.excludedDays, day)} ? 'checked' : ''">
+                            <input type="checkbox"
+                                   th:field="*{excludedDays}"
+                                   th:value="${day}"
+                                   th:id="'day_' + ${day}"
+                                   onchange="toggleCheckbox(this)"/>
+                            <label th:for="'day_' + ${day}"
+                                   th:text="${#strings.capitalize(#strings.toLowerCase(day))}">Day</label>
+                        </div>
+                    </div>
+                    <div class="help-text">
+                        <i class="fas fa-lightbulb"></i>
+                        Tip: Most teams skip weekends. Leave all unchecked to send questions every day.
+                    </div>
+                </div>
+
+                <!-- Questions Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-question-circle"></i> Daily Questions</h3>
+                    <label>Customize the questions sent to your team:</label>
+
+                    <div class="questions-container">
+                        <div id="questions-list">
+                            <div class="question-row" th:each="q, iterStat : *{questions}">
+                                <div class="question-number" th:text="${iterStat.index + 1}">1</div>
+                                <input type="text"
+                                       th:field="*{questions[__${iterStat.index}__]}"
+                                       placeholder="Enter your question here..."
+                                       class="form-control"/>
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        onclick="removeQuestion(this)"
+                                        th:if="${iterStat.index > 0}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-add"
+                                onclick="addQuestion()">
+                            <i class="fas fa-plus"></i> Add Another Question
+                        </button>
+                    </div>
+
+                    <div class="help-text">
+                        <i class="fas fa-users"></i>
+                        Questions are sent one at a time via direct message. Team members respond privately.
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a th:href="@{'/server/' + ${serverId}}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</form>
+</div>
 
 <script>
+    let questionCount = document.querySelectorAll('.question-row').length;
+
     function addQuestion() {
-        const container = document.getElementById("questions-container");
-        const index = container.children.length;
-        const div = document.createElement("div");
-        div.className = "question-row";
-        div.innerHTML = `
-            <input type="text" name="questions[${index}]" placeholder="Enter a question"/>
-            <button type="button" class="btn btn-danger" onclick="removeQuestion(this)">Remove</button>
+        const container = document.getElementById("questions-list");
+        const newRow = document.createElement("div");
+        newRow.className = "question-row";
+
+        newRow.innerHTML = `
+            <div class="question-number">${questionCount + 1}</div>
+            <input type="text"
+                   name="questions[${questionCount}]"
+                   placeholder="Enter your question here..."
+                   class="form-control"/>
+            <button type="button"
+                    class="btn btn-danger"
+                    onclick="removeQuestion(this)">
+                <i class="fas fa-trash"></i>
+            </button>
         `;
-        container.appendChild(div);
+
+        container.appendChild(newRow);
+        questionCount++;
+        updateQuestionNumbers();
+
+        // Focus on the new input
+        newRow.querySelector('input').focus();
     }
 
     function removeQuestion(button) {
-        button.parentElement.remove();
+        if (document.querySelectorAll('.question-row').length > 1) {
+            button.parentElement.remove();
+            questionCount--;
+            updateQuestionNumbers();
+        }
     }
+
+    function updateQuestionNumbers() {
+        const rows = document.querySelectorAll('.question-row');
+        rows.forEach((row, index) => {
+            const numberElement = row.querySelector('.question-number');
+            if (numberElement) {
+                numberElement.textContent = index + 1;
+            }
+        });
+    }
+
+    function toggleCheckbox(checkbox) {
+        const item = checkbox.closest('.checkbox-item');
+        if (checkbox.checked) {
+            item.classList.add('checked');
+        } else {
+            item.classList.remove('checked');
+        }
+    }
+
+    // Initialize checkbox states on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.checkbox-item input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            toggleCheckbox(checkbox);
+        });
+    });
+
+    // Add smooth scrolling for form validation errors
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const timeInput = document.getElementById('sendTime');
+        const questions = document.querySelectorAll('.question-row input[type="text"]');
+
+        if (!timeInput.value) {
+            e.preventDefault();
+            timeInput.focus();
+            timeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        let hasEmptyQuestion = false;
+        questions.forEach(input => {
+            if (!input.value.trim()) {
+                hasEmptyQuestion = true;
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        if (hasEmptyQuestion) {
+            e.preventDefault();
+        }
+    });
 </script>
 </body>
 </html>

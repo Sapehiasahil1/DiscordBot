@@ -87,6 +87,7 @@
             display: flex;
             gap: 10px;
             align-items: end;
+            flex-wrap: wrap;
         }
         .btn {
             padding: 12px 20px;
@@ -121,6 +122,14 @@
         }
         .btn-accent:hover {
             background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-download {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-download:hover {
+            background: #d97706;
             transform: translateY(-1px);
         }
         .active-filters {
@@ -373,6 +382,10 @@
                     <button type="button" class="btn btn-accent" onclick="setLast30Days()">Last 30 Days</button>
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
                     <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear All</button>
+                    <!-- Download Button -->
+                    <button type="button" class="btn btn-download" onclick="downloadExcel()">
+                        📥 Download Excel
+                    </button>
                 </div>
             </div>
         </form>
@@ -756,6 +769,40 @@
             closeMemberModal();
         }
     });
+
+    // Download Excel Function
+    function downloadExcel() {
+        // Get current filter values
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        // Get serverId from the current URL
+        const pathParts = window.location.pathname.split('/');
+        const serverId = pathParts[pathParts.indexOf('attendance') - 1];
+
+        // Build download URL with current filters
+        let downloadUrl = `/attendance/${serverId}/download`;
+        const params = new URLSearchParams();
+
+        if (startDate) {
+            params.append('startDate', startDate);
+        }
+        if (endDate) {
+            params.append('endDate', endDate);
+        }
+
+        if (params.toString()) {
+            downloadUrl += '?' + params.toString();
+        }
+
+        // Create invisible link and trigger download
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = 'attendance_report.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 </script>
 </body>
 </html>

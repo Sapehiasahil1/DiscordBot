@@ -2,6 +2,11 @@ package com.sapehia.Geekbot.controller;
 
 import com.sapehia.Geekbot.model.*;
 import com.sapehia.Geekbot.service.*;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -37,11 +43,12 @@ public class AttendanceController {
     }
 
     @GetMapping("/{serverId}")
-    public String getAttendanceReport(
+    public void downloadAttendanceReport(
             @PathVariable String serverId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            Model model) {
+            HttpServletResponse response) throws IOException {
+
         if (startDate == null) {
             startDate = LocalDate.now().minusDays(30);
         }
@@ -54,32 +61,45 @@ public class AttendanceController {
 
         List<MemberAttendance> memberAttendanceList = new ArrayList<>();
         int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
-        double totalAttendancePercentage = 0;
 
         for (Member member : members) {
             int respondedDays = answerService.getRespondedDaysCount(serverId, member.getDiscordUserId(), startDate, endDate);
-
             double percentage = totalDays > 0 ? (respondedDays * 100.0 / totalDays) : 0;
-            totalAttendancePercentage += percentage;
 
             MemberAttendance attendance = new MemberAttendance(member, respondedDays, totalDays, percentage);
             memberAttendanceList.add(attendance);
         }
 
-        double avgAttendance = members.isEmpty() ? 0 : totalAttendancePercentage / members.size();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Attendance Report");
 
-        model.addAttribute("memberAttendance", memberAttendanceList);
-        model.addAttribute("totalMembers", members.size());
-        model.addAttribute("totalDays", totalDays);
-        model.addAttribute("avgAttendance", avgAttendance);
-        model.addAttribute("serverName", server.getServerName());
-        model.addAttribute("serverId", serverId);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Member Name");
+        header.createCell(1).setCellValue("Responded Days");
+        header.createCell(2).setCellValue("Total Days");
+        header.createCell(3).setCellValue("Percentage");
 
-        return "attendance-today";
+        int rowNum = 1;
+        for (MemberAttendance attendance : memberAttendanceList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(attendance.getMember().getUsername());
+            row.createCell(1).setCellValue(attendance.getRespondedDays());
+            row.createCell(2).setCellValue(attendance.getTotalDays());
+            row.createCell(3).setCellValue(attendance.getPercentage());
+        }
+
+        for (int i = 0; i < 4; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=attendance_report.xlsx");
+
+        ServletOutputStream out = response.getOutputStream();
+        workbook.write(out);
+        workbook.close();
+        out.close();
     }
-
 
     @GetMapping("/{serverId}/member/{userId}/today")
     @ResponseBody

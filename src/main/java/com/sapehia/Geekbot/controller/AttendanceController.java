@@ -43,6 +43,50 @@ public class AttendanceController {
     }
 
     @GetMapping("/{serverId}")
+    public String getAttendanceReport(
+            @PathVariable String serverId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            Model model) {
+        if (startDate == null) {
+            startDate = LocalDate.now().minusDays(30);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        Server server = serverService.getServerById(serverId);
+        List<Member> members = serverService.listOfMembers(serverId);
+
+        List<MemberAttendance> memberAttendanceList = new ArrayList<>();
+        int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        double totalAttendancePercentage = 0;
+
+        for (Member member : members) {
+            int respondedDays = answerService.getRespondedDaysCount(serverId, member.getDiscordUserId(), startDate, endDate);
+
+            double percentage = totalDays > 0 ? (respondedDays * 100.0 / totalDays) : 0;
+            totalAttendancePercentage += percentage;
+
+            MemberAttendance attendance = new MemberAttendance(member, respondedDays, totalDays, percentage);
+            memberAttendanceList.add(attendance);
+        }
+
+        double avgAttendance = members.isEmpty() ? 0 : totalAttendancePercentage / members.size();
+
+        model.addAttribute("memberAttendance", memberAttendanceList);
+        model.addAttribute("totalMembers", members.size());
+        model.addAttribute("totalDays", totalDays);
+        model.addAttribute("avgAttendance", avgAttendance);
+        model.addAttribute("serverName", server.getServerName());
+        model.addAttribute("serverId", serverId);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        return "attendance-today";
+    }
+
+    @GetMapping("/{serverId}/download")
     public void downloadAttendanceReport(
             @PathVariable String serverId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

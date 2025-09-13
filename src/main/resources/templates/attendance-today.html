@@ -772,37 +772,37 @@
 
     // Download Excel Function
     function downloadExcel() {
-        // Get current filter values
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+    // Get current filter values
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
 
-        // Get serverId from the current URL
-        const pathParts = window.location.pathname.split('/');
-        const serverId = pathParts[pathParts.indexOf('attendance') - 1];
+    // Get serverId from the URL correctly
+    const pathParts = window.location.pathname.split('/');
+    const serverId = pathParts[pathParts.length - 1];
 
-        // Build download URL with current filters
-        let downloadUrl = `/attendance/${serverId}/download`;
-        const params = new URLSearchParams();
+    // Build download URL with current filters
+    let downloadUrl = `/attendance/${serverId}/download`;
+    const params = new URLSearchParams();
 
-        if (startDate) {
-            params.append('startDate', startDate);
-        }
-        if (endDate) {
-            params.append('endDate', endDate);
-        }
-
-        if (params.toString()) {
-            downloadUrl += '?' + params.toString();
-        }
-
-        // Create invisible link and trigger download
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = 'attendance_report.xlsx';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    if (startDate) {
+        params.append('startDate', startDate);
     }
+    if (endDate) {
+        params.append('endDate', endDate);
+    }
+
+    if (params.toString()) {
+        downloadUrl += '?' + params.toString();
+    }
+
+    // Create invisible link and trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'attendance_report.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 </script>
 </body>
 </html>

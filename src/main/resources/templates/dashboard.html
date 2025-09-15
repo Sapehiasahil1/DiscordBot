@@ -342,12 +342,6 @@
                 <div class="logo-icon">DB</div>
                 <span>Discord Bot</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#" th:href="@{/}">Home</a></li>
-                <li><a href="#" th:href="@{/product}">Product</a></li>
-                <li><a href="#" th:href="@{/templates}">Templates</a></li>
-                <li><a href="#" th:href="@{/pricing}">Pricing</a></li>
-            </ul>
             <div class="nav-buttons">
                 <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot" class="btn-secondary" sec:authorize="isAuthenticated()">Invite Bot</a>
                 <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">

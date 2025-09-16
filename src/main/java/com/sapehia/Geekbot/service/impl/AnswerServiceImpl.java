@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class AnswerServiceImpl implements AnswerService{
@@ -77,5 +80,14 @@ public class AnswerServiceImpl implements AnswerService{
     @Override
     public Answer getAnswerByMemberAndAssignment(String discordUserId, Long assignmentId) {
         return answerRepository.findByMemberDiscordUserIdAndAssignmentId(discordUserId, assignmentId);
+    }
+
+    @Override
+    public Map<String, List<Answer>> getMemberAnswersByServerAndDate(String serverId, LocalDate date) {
+        List<Answer> answers = answerRepository.findAllByServerIdAndDate(serverId, date);
+
+        return answers
+                .stream()
+                .collect(Collectors.groupingBy(a-> a.getMember().getUsername()));
     }
 }

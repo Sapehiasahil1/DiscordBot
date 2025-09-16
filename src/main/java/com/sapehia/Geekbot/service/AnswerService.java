@@ -4,6 +4,7 @@ import com.sapehia.Geekbot.model.Answer;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface AnswerService {
     Answer addAnswer(Answer answer);
@@ -20,4 +21,5 @@ public interface AnswerService {
     String findResponseForMemberQuestionOnDate(String serverId, String memberId, long id, LocalDate today);
 
     Answer getAnswerByMemberAndAssignment(String userId, Long id);
+    Map<String, List<Answer>> getMemberAnswersByServerAndDate(String serverId, LocalDate date);
 }

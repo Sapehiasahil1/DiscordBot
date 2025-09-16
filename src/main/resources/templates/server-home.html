@@ -405,8 +405,8 @@
                 </div>
             </a>
 
-            <a th:href="@{'/responses/' + ${serverId} + '/details'}" class="nav-card">
-                <div class="nav-icon">
+            <a th:href="@{'/responses/' + ${serverId} + '/details?date=' + ${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}}" class="nav-card">
+            <div class="nav-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="nav-content">

@@ -26,10 +26,14 @@ public class AnswerController {
         this.questionService = questionService;
     }
 
-    @GetMapping("responses/{serverId}/details")
+    @GetMapping("/responses/{serverId}/details")
     public String getServerMembersAnswers(@PathVariable String serverId,
                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                           Model model) {
+        if(date == null) {
+            date = LocalDate.now();
+        }
+
         Map<String, List<Answer>> memberAnswers = answerService
                 .getMemberAnswersByServerAndDate(serverId, date);
 

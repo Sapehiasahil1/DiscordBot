@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -29,11 +30,11 @@ public class AttendanceController {
     private final MemberService memberService;
     private final QuestionAssignmentService questionAssignmentService;
 
-    public AttendanceController (AnswerService answerService,
-                                 ServerService serverService,
-                                 QuestionService questionService,
-                                 MemberService memberService,
-                                 QuestionAssignmentService questionAssignmentService
+    public AttendanceController(AnswerService answerService,
+                                ServerService serverService,
+                                QuestionService questionService,
+                                MemberService memberService,
+                                QuestionAssignmentService questionAssignmentService
     ) {
         this.answerService = answerService;
         this.serverService = serverService;
@@ -48,6 +49,7 @@ public class AttendanceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             Model model) {
+
         if (startDate == null) {
             startDate = LocalDate.now().minusDays(30);
         }
@@ -58,8 +60,15 @@ public class AttendanceController {
         Server server = serverService.getServerById(serverId);
         List<Member> members = serverService.listOfMembers(serverId);
 
+        Set<DayOfWeek> excludedDays = server.getExcludedDaysAsSet();
+        int totalDays = 0;
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            if (!excludedDays.contains(date.getDayOfWeek())) {
+                totalDays++;
+            }
+        }
+
         List<MemberAttendance> memberAttendanceList = new ArrayList<>();
-        int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
         double totalAttendancePercentage = 0;
 
         for (Member member : members) {
@@ -103,9 +112,17 @@ public class AttendanceController {
         Server server = serverService.getServerById(serverId);
         List<Member> members = serverService.listOfMembers(serverId);
 
-        List<MemberAttendance> memberAttendanceList = new ArrayList<>();
-        int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        Set<DayOfWeek> excludedDays = server.getExcludedDaysAsSet();
+        int totalDays = 0;
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            if (!excludedDays.contains(current.getDayOfWeek())) {
+                totalDays++;
+            }
+            current = current.plusDays(1);
+        }
 
+        List<MemberAttendance> memberAttendanceList = new ArrayList<>();
         for (Member member : members) {
             int respondedDays = answerService.getRespondedDaysCount(serverId, member.getDiscordUserId(), startDate, endDate);
             double percentage = totalDays > 0 ? (respondedDays * 100.0 / totalDays) : 0;
@@ -139,10 +156,10 @@ public class AttendanceController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=attendance_report.xlsx");
 
-        ServletOutputStream out = response.getOutputStream();
-        workbook.write(out);
+        try (ServletOutputStream out = response.getOutputStream()) {
+            workbook.write(out);
+        }
         workbook.close();
-        out.close();
     }
 
     @GetMapping("/{serverId}/member/{userId}/today")

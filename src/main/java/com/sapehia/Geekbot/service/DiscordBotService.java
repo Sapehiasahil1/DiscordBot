@@ -24,6 +24,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -251,6 +252,39 @@ public class DiscordBotService extends ListenerAdapter {
         dailyRespondedUsers.add(userId + "_" + serverId);
 
         event.getChannel().sendMessage("✅ Your responses have been saved. Have a great day!").queue();
+        shareResponseInServer(serverId, userId, responses, questions);
+    }
+
+    private void shareResponseInServer(String serverId, String userId, String[] responses, List<Question> questions) {
+        Guild guild = jda.getGuildById(serverId);
+        if (guild == null) return;
+
+        TextChannel channel = guild.getTextChannels().stream()
+                .filter(c -> c.getName().equalsIgnoreCase("daily-responses"))
+                .findFirst()
+                .orElse(guild.getTextChannels().stream()
+                        .filter(c -> c.getName().toLowerCase().contains("general"))
+                        .findFirst()
+                        .orElse(guild.getTextChannels().isEmpty() ? null : guild.getTextChannels().get(0)));
+
+        if (channel == null) return;
+
+        StringBuilder formattedResponse = new StringBuilder();
+        formattedResponse.append(String.format(
+                "**Daily Responses from <@%s>** - %s\n\n",
+                userId, LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+        ));
+
+        for (int i = 0; i < questions.size(); i++) {
+            String questionText = questions.get(i).getText();
+            String answer = (i < responses.length && responses[i] != null && !responses[i].isBlank())
+                    ? responses[i]
+                    : "*No response*";
+
+            formattedResponse.append(String.format("**Q%d:** %s\n%s\n\n", i + 1, questionText, answer));
+        }
+
+        channel.sendMessage(formattedResponse.toString().trim()).queue();
     }
 
     private void createDefaultQuestions(Server serverEntity) {
@@ -269,7 +303,7 @@ public class DiscordBotService extends ListenerAdapter {
     }
 
     private void sendSetupInstructions(Guild guild, Server server) {
-        String setupUrl = "https://discordbot-fdr5.onrender.com/server/"+ server.getServerId() +"/configuration";
+        String setupUrl = "https://discordbot-fdr5.onrender.com/server/" + server.getServerId() + "/configuration";
 
         Set<DayOfWeek> excludedDaysSet = server.getExcludedDaysAsSet();
         String excludedDaysText = excludedDaysSet.isEmpty() ?

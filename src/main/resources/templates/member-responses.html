@@ -568,10 +568,11 @@
                                 <span class="time-badge" th:text="${#temporals.format(memberEntry.value[0].submittedAt, 'HH:mm')}">12:42</span>
                             </td>
                             <td th:each="question : ${questions}">
-                                <div class="response-content"
-                                     th:text="${memberEntry.value.?[assignment.question.id == question.id][0]?.response} ?: 'No response provided'"
-                                     th:classappend="${#strings.length(memberEntry.value.?[assignment.question.id == question.id][0]?.response ?: '') > 100 ? 'long' : ''}">
-                                    Answer content goes here and can be quite long so we need to handle it properly with proper truncation...
+                                <div th:with="answer=${memberEntry.value.?[assignment.question.id == question.id][0]}">
+                                    <div class="response-content"
+                                         th:text="${answer?.response ?: 'No response provided'}"
+                                         th:classappend="${#strings.length(answer?.response ?: '') > 100 ? 'long' : ''}">
+                                    </div>
                                 </div>
                             </td>
                         </tr>

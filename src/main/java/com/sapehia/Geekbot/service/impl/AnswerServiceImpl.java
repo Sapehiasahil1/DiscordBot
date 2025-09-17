@@ -2,6 +2,7 @@ package com.sapehia.Geekbot.service.impl;
 
 import com.sapehia.Geekbot.model.Answer;
 import com.sapehia.Geekbot.model.Member;
+import com.sapehia.Geekbot.model.Server;
 import com.sapehia.Geekbot.repository.AnswerRepository;
 import com.sapehia.Geekbot.service.AnswerService;
 import com.sapehia.Geekbot.service.MemberService;
@@ -90,5 +91,13 @@ public class AnswerServiceImpl implements AnswerService{
         return answers
                 .stream()
                 .collect(Collectors.groupingBy(a-> a.getMember().getUsername()));
+    }
+
+    @Override
+    public Map<Member, List<Answer>> getAnswersGroupedByMember(Server server, LocalDate date) {
+        List<Answer> answers = answerRepository.findAnswersByServerAndDate(server, date);
+
+        return answers.stream()
+                .collect(Collectors.groupingBy(Answer::getMember));
     }
 }

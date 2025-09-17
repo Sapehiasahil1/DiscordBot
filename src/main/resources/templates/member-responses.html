@@ -117,60 +117,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Back Button Styles */
-        .back-button {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-light);
-            color: var(--text-secondary);
-            padding: 0.625rem 1.25rem;
-            border-radius: var(--radius-md);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.875rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .back-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-gradient);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            border-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .back-button:hover::before {
-            left: 0;
-            opacity: 1;
-        }
-
-        .back-button i,
-        .back-button span {
-            position: relative;
-            z-index: 2;
-        }
-
-        .back-button:hover i {
-            transform: translateX(-3px);
-        }
-
         /* Card Styles */
         .card {
             background: var(--bg-secondary);
@@ -411,12 +357,6 @@
             overflow: hidden;
         }
 
-        .response-content .no-response {
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 0.85rem;
-        }
-
         /* No Responses State */
         .no-responses {
             display: flex;
@@ -515,11 +455,6 @@
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
-
-            .back-button {
-                padding: 0.625rem 1.25rem;
-                font-size: 0.875rem;
-            }
         }
 
         /* Loading Animation */
@@ -548,59 +483,29 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        /* Debug styles */
-        .debug-info {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            margin: 1rem 0;
-            font-family: monospace;
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <!-- Enhanced Header -->
     <div class="page-header">
-        <div class="d-flex align-items-center gap-3 mb-3">
-            <a th:href="@{'/server/' + ${serverId}}" class="back-button">
-                <i class="fas fa-arrow-left"></i>
-                <span>Back</span>
-            </a>
-            <div>
-                <h1 class="page-title mb-0">Check-ins Dashboard</h1>
-            </div>
-        </div>
+        <h1 class="page-title">Check-ins Dashboard</h1>
         <p class="page-subtitle">Monitor team responses and engagement metrics</p>
-    </div>
-
-    <!-- Debug Information (remove in production) -->
-    <div class="debug-info" th:if="${#lists.isEmpty(memberAnswers)}">
-        <strong>Debug Info:</strong><br>
-        Server ID: <span th:text="${serverId}">N/A</span><br>
-        Date: <span th:text="${date}">N/A</span><br>
-        Questions count: <span th:text="${questions != null ? questions.size() : 0}">0</span><br>
-        Member answers size: <span th:text="${memberAnswers != null ? memberAnswers.size() : 0}">0</span>
     </div>
 
     <!-- Stats Overview -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number" th:text="${memberAnswers != null ? memberAnswers.size() : 0}">0</div>
-            <div class="stat-label">Members with Responses</div>
+            <div class="stat-number" th:text="${memberAnswers.size()}">12</div>
+            <div class="stat-label">Total Responses</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" th:text="${questions != null ? questions.size() : 0}">0</div>
+            <div class="stat-number" th:text="${questions != null ? questions.size() : 0}">5</div>
             <div class="stat-label">Questions Asked</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number"
-                 th:text="${memberAnswers != null ? memberAnswers.values().stream().mapToInt(list -> list.size()).sum() : 0}">0</div>
-            <div class="stat-label">Total Responses</div>
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Response Rate</div>
         </div>
     </div>
 
@@ -632,12 +537,10 @@
                 <i class="fas fa-comments me-2"></i>
                 Responses for <span th:text="${#temporals.format(date, 'MMMM dd, yyyy')}">September 16, 2025</span>
             </h6>
-            <span class="badge bg-primary"
-                  th:text="${memberAnswers != null ? memberAnswers.size() + ' members responded' : '0 responses'}">0 responses</span>
+            <span class="badge bg-primary" th:text="${memberAnswers.size() + ' responses'}">12 responses</span>
         </div>
         <div class="card-body p-0">
-            <!-- Check if we have both questions and member answers -->
-            <div th:if="${questions != null and !questions.empty and memberAnswers != null and !memberAnswers.empty}" class="table-container">
+            <div th:if="${questions != null and !questions.empty}" class="table-container">
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
@@ -655,53 +558,34 @@
                         </thead>
                         <tbody>
                         <tr th:each="memberEntry : ${memberAnswers}" class="interactive">
-                            <!-- Member Info Column -->
                             <td>
-                                <div class="member-name" th:if="${!#lists.isEmpty(memberEntry.value)}">
-                                    <div class="member-avatar"
-                                         th:text="${#strings.substring(memberEntry.value[0].member.username, 0, 1).toUpperCase()}">?</div>
-                                    <span th:text="${memberEntry.value[0].member.username}">Unknown User</span>
+                                <div class="member-name">
+                                    <div class="member-avatar" th:text="${#strings.substring(memberEntry.value[0].member.username, 0, 1).toUpperCase()}">J</div>
+                                    <span th:text="${memberEntry.value[0].member.username}">John Doe</span>
                                 </div>
                             </td>
-                            <!-- Time Column -->
                             <td>
-                                <span class="time-badge"
-                                      th:if="${!#lists.isEmpty(memberEntry.value)}"
-                                      th:text="${#temporals.format(memberEntry.value[0].submittedAt, 'HH:mm')}">--:--</span>
+                                <span class="time-badge" th:text="${#temporals.format(memberEntry.value[0].submittedAt, 'HH:mm')}">12:42</span>
                             </td>
-                            <!-- Answer Columns - One for each question -->
                             <td th:each="question : ${questions}">
-                                <div class="response-content">
-                                    <!-- Find and display the answer for this specific question -->
-                                    <th:block th:each="answer : ${memberEntry.value}">
-                                        <span th:if="${answer.assignment.question.id == question.id}"
-                                              th:text="${answer.response}"
-                                              th:classappend="${#strings.length(answer.response ?: '') > 100 ? 'long' : ''}">
-                                        </span>
-                                    </th:block>
-                                    <!-- Show "No response" if no answer found for this question -->
-                                    <span th:unless="${memberEntry.value.?[assignment.question.id == __${question.id}__].size() > 0}"
-                                          class="no-response">No response provided</span>
+                                <div th:with="answer=${memberQuestionAnswers[memberEntry.value[0].member.discordUserId][question.id]}">
+                                    <div class="response-content"
+                                         th:text="${answer != null ? answer.response : 'No response provided'}"
+                                         th:classappend="${answer != null and #strings.length(answer.response) > 100 ? 'long' : ''}">
+                                    </div>
                                 </div>
                             </td>
+
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- No Questions State -->
             <div th:if="${questions == null or questions.empty}" class="no-responses">
-                <i class="fas fa-question-circle"></i>
-                <h4>No questions configured</h4>
-                <p>No questions have been set up for this server yet. Please configure questions first.</p>
-            </div>
-
-            <!-- No Responses State -->
-            <div th:if="${questions != null and !questions.empty and (memberAnswers == null or memberAnswers.empty)}" class="no-responses">
                 <i class="fas fa-calendar-times"></i>
                 <h4>No responses found</h4>
-                <p>No check-in responses were submitted on <strong th:text="${#temporals.format(date, 'MMMM dd, yyyy')}">this date</strong>. Try selecting a different date to view team responses.</p>
+                <p>No check-in responses were submitted on this date. Try selecting a different date to view team responses.</p>
             </div>
         </div>
     </div>
@@ -733,70 +617,20 @@
         $('.stat-number').each(function() {
             const $this = $(this);
             const countTo = parseInt($this.text().replace(/\D/g, '')) || 0;
-            
-            if (countTo > 0) {
-                $({ countNum: 0 }).animate({
-                    countNum: countTo
-                }, {
-                    duration: 2000,
-                    easing: 'swing',
-                    step: function() {
-                        $this.text(Math.floor(this.countNum));
-                    },
-                    complete: function() {
-                        $this.text(countTo);
-                    }
-                });
-            }
+
+            $({ countNum: 0 }).animate({
+                countNum: countTo
+            }, {
+                duration: 2000,
+                easing: 'swing',
+                step: function() {
+                    $this.text(Math.floor(this.countNum) + ($this.text().includes('%') ? '%' : ''));
+                },
+                complete: function() {
+                    $this.text(countTo + ($this.text().includes('%') ? '%' : ''));
+                }
+            });
         });
-
-        // Add smooth hover animation to back button
-        $('.back-button').hover(
-            function() {
-                $(this).find('i').addClass('fa-bounce');
-            },
-            function() {
-                $(this).find('i').removeClass('fa-bounce');
-            }
-        );
-
-        // Expand/collapse long responses on click
-        $('.response-content.long').on('click', function() {
-            $(this).toggleClass('expanded');
-        });
-
-        // Add expanded class styling
-        $('<style>')
-            .prop('type', 'text/css')
-            .html(`
-                .response-content.long.expanded {
-                    -webkit-line-clamp: unset;
-                    max-height: none;
-                    cursor: pointer;
-                }
-                .response-content.long {
-                    cursor: pointer;
-                }
-                .response-content.long:hover {
-                    background-color: #f8fafc;
-                    border-radius: 0.375rem;
-                    padding: 0.5rem;
-                }
-            `)
-            .appendTo('head');
-
-        // Debug: Log data to console for troubleshooting
-        console.log('Page loaded');
-        console.log('Questions available:', $('.table thead th').length - 2); // Subtract member and time columns
-        console.log('Member rows:', $('.table tbody tr').length);
-        
-        // Check if any responses are actually displayed
-        const responseElements = $('.response-content:not(:has(.no-response))');
-        console.log('Responses with content:', responseElements.length);
-        
-        if (responseElements.length === 0) {
-            console.warn('No responses found in the table. Check your data structure.');
-        }
     });
 </script>
 </body>

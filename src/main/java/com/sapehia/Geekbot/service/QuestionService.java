@@ -1,7 +1,9 @@
 package com.sapehia.Geekbot.service;
 
 import com.sapehia.Geekbot.model.Question;
+import com.sapehia.Geekbot.model.Server;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface QuestionService {
@@ -10,4 +12,6 @@ public interface QuestionService {
     void deleteQuestion(Long questionId);
     List<Question> getQuestionsForServer(String serverId);
     Question getQuestionById(Long questionId);
+
+    List<Question> findByServerAndDate(Server server, LocalDate date);
 }

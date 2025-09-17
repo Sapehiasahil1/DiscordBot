@@ -1,10 +1,12 @@
 package com.sapehia.Geekbot.service.impl;
 
 import com.sapehia.Geekbot.model.Question;
+import com.sapehia.Geekbot.model.Server;
 import com.sapehia.Geekbot.repository.QuestionRepository;
 import com.sapehia.Geekbot.service.QuestionService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -45,5 +47,10 @@ public class QuestionServiceImpl implements QuestionService {
     public Question getQuestionById(Long questionId) {
         return questionRepository.findById(questionId)
                 .orElseThrow(()-> new RuntimeException("Question not found with id " + questionId));
+    }
+
+    @Override
+    public List<Question> findByServerAndDate(Server server, LocalDate date) {
+        return questionRepository.findQuestionsByServerAndDate(server, date);
     }
 }

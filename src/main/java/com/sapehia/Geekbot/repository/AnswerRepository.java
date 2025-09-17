@@ -1,6 +1,7 @@
 package com.sapehia.Geekbot.repository;
 
 import com.sapehia.Geekbot.model.Answer;
+import com.sapehia.Geekbot.model.Server;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,4 +62,9 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
             @Param("endDate") LocalDate endDate);
 
     Answer findByMemberDiscordUserIdAndAssignmentId(String discordUserId, Long assignmentId);
+
+    @Query("SELECT a FROM Answer a " +
+            "WHERE a.assignment.server = :server AND a.assignment.date = :date")
+    List<Answer> findAnswersByServerAndDate(@Param("server") Server server,
+                                            @Param("date") LocalDate date);
 }

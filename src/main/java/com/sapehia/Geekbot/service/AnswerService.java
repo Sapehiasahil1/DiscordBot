@@ -1,6 +1,8 @@
 package com.sapehia.Geekbot.service;
 
 import com.sapehia.Geekbot.model.Answer;
+import com.sapehia.Geekbot.model.Member;
+import com.sapehia.Geekbot.model.Server;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,4 +24,6 @@ public interface AnswerService {
 
     Answer getAnswerByMemberAndAssignment(String userId, Long id);
     Map<String, List<Answer>> getMemberAnswersByServerAndDate(String serverId, LocalDate date);
+
+    Map<Member, List<Answer>> getAnswersGroupedByMember(Server server, LocalDate date);
 }

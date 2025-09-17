@@ -97,6 +97,38 @@
         .page-header {
             margin-bottom: 2.5rem;
             position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            margin-top: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+
+        .header-content {
+            flex: 1;
         }
 
         .page-title {
@@ -440,6 +472,16 @@
                 padding: 1.5rem 1rem;
             }
 
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .back-button {
+                align-self: flex-start;
+            }
+
             .page-title {
                 font-size: 2rem;
             }
@@ -487,10 +529,15 @@
 </head>
 <body>
 <div class="container-fluid">
-    <!-- Enhanced Header -->
+    <!-- Enhanced Header with Back Button -->
     <div class="page-header">
-        <h1 class="page-title">Check-ins Dashboard</h1>
-        <p class="page-subtitle">Monitor team responses and engagement metrics</p>
+        <a th:href="@{'/server/' + ${serverId}}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="header-content">
+            <h1 class="page-title">Check-ins Dashboard</h1>
+            <p class="page-subtitle">Monitor team responses and engagement metrics</p>
+        </div>
     </div>
 
     <!-- Stats Overview -->

@@ -28,8 +28,10 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
                                      @Param("dateEnd") LocalDateTime dateEnd);
 
     @Query("SELECT a FROM Answer a " +
-            "WHERE a.assignment.server.serverId = :serverId " +
-            "AND a.assignment.date = :date")
+            "JOIN FETCH a.assignment qass " +
+            "JOIN FETCH qass.question q " +
+            "WHERE qass.server.serverId = :serverId " +
+            "AND qass.date = :date")
     List<Answer> findAllByServerIdAndDate(@Param("serverId") String serverId,
                                           @Param("date") LocalDate date);
 

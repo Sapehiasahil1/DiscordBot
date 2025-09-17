@@ -84,7 +84,8 @@ public class AnswerServiceImpl implements AnswerService{
 
     @Override
     public Map<String, List<Answer>> getMemberAnswersByServerAndDate(String serverId, LocalDate date) {
-        List<Answer> answers = answerRepository.findAllByServerIdAndDate(serverId, date);
+        List<Answer> answers = answerRepository
+                .findByServerAndDate(serverId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
 
         return answers
                 .stream()

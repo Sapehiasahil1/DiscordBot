@@ -17,28 +17,23 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/attendance")
 public class AttendanceController {
     private final AnswerService answerService;
     private final ServerService serverService;
-    private final QuestionService questionService;
     private final MemberService memberService;
     private final QuestionAssignmentService questionAssignmentService;
 
     public AttendanceController(AnswerService answerService,
                                 ServerService serverService,
-                                QuestionService questionService,
                                 MemberService memberService,
                                 QuestionAssignmentService questionAssignmentService
     ) {
         this.answerService = answerService;
         this.serverService = serverService;
-        this.questionService = questionService;
         this.questionAssignmentService = questionAssignmentService;
         this.memberService = memberService;
     }
@@ -211,40 +206,5 @@ public class AttendanceController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @GetMapping("/today/{serverId}")
-    public String getTodayResponses(@PathVariable String serverId, Model model) {
-        List<Question> questionList = questionService.getQuestionsForServer(serverId);
-        List<Member> members = serverService.listOfMembers(serverId);
-        Set<Member> uniqueMemberResponse = serverService.uniqueMemberResponse(serverId, members);
-
-        model.addAttribute("members", members);
-        model.addAttribute("questions", questionList);
-        model.addAttribute("answers", uniqueMemberResponse);
-        model.addAttribute("serverName", serverService.getServerById(serverId).getServerName());
-        model.addAttribute("serverId", serverId);
-
-        return "attendance-today";
-    }
-
-    @GetMapping("/{serverId}/user/{memberId}")
-    public String getUserAttendance(@PathVariable String memberId,
-                                    @PathVariable String serverId,
-                                    Model model) {
-        long attendanceCount = answerService.getUserResponsesInLast30Days(serverId, memberId);
-        model.addAttribute("memberId", memberId);
-        model.addAttribute("attendanceCount", attendanceCount);
-
-        return "attendance-user";
-    }
-
-    @GetMapping("/date/{date}")
-    public String getByDate(@PathVariable String date, Model model) {
-        List<Answer> answers = answerService.getAnswerByDate(LocalDate.parse(date));
-        model.addAttribute("answers", answers);
-        model.addAttribute("date", date);
-
-        return "attendance-date";
     }
 }

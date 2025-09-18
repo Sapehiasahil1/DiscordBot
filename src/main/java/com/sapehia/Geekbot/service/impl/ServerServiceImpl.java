@@ -2,7 +2,6 @@ package com.sapehia.Geekbot.service.impl;
 
 import com.sapehia.Geekbot.model.*;
 import com.sapehia.Geekbot.repository.*;
-import com.sapehia.Geekbot.service.AnswerService;
 import com.sapehia.Geekbot.service.QuestionAssignmentService;
 import com.sapehia.Geekbot.service.QuestionService;
 import com.sapehia.Geekbot.service.ServerService;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +21,6 @@ public class ServerServiceImpl implements ServerService {
 
     private final ServerRepository serverRepository;
     private final MemberRepository memberRepository;
-    private final AnswerService answerService;
     private final QuestionService questionService;
     private final QuestionAssignmentService questionAssignmentService;
 
@@ -32,12 +28,10 @@ public class ServerServiceImpl implements ServerService {
 
     public ServerServiceImpl(ServerRepository serverRepository,
                              MemberRepository memberRepository,
-                             AnswerService answerService,
                              QuestionService questionService,
                              QuestionAssignmentService questionAssignmentService) {
         this.serverRepository = serverRepository;
         this.memberRepository = memberRepository;
-        this.answerService = answerService;
         this.questionService = questionService;
         this.questionAssignmentService = questionAssignmentService;
     }
@@ -111,21 +105,9 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public Set<Member> uniqueMemberResponse(String serverId, List<Member> members) {
-        List<Answer> answers = answerService.getTodayMembersResponse(serverId);
-
-        Set<Member> uniqueMembers = new HashSet<>();
-
-        for (Answer answer : answers) {
-            uniqueMembers.add(answer.getMember());
-        }
-        return uniqueMembers;
-    }
-
-    @Override
     public List<Question> getQuestionFromServer(String serverId) {
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(()-> new RuntimeException("Server not found with id " + serverId));
+                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
 
         return server.getQuestions();
     }
@@ -161,23 +143,5 @@ public class ServerServiceImpl implements ServerService {
         }
 
         serverRepository.save(server);
-    }
-
-    @Override
-    @Transactional
-    public void updateServerExcludedDays(String serverId, Set<DayOfWeek> excludedDays) {
-        Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
-
-        server.setExcludedDaysFromSet(excludedDays);
-        serverRepository.save(server);
-    }
-
-    @Override
-    public Set<DayOfWeek> getServerExcludedDays(String serverId) {
-        Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new RuntimeException("Server not found with id " + serverId));
-
-        return server.getExcludedDaysAsSet();
     }
 }

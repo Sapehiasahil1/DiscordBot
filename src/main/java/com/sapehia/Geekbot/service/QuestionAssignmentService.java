@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface QuestionAssignmentService {
     QuestionAssignment save(QuestionAssignment questionAssignment);
+
     QuestionAssignment getByServerIdAndQuestionIdAndAssignedDate(
             String serverId, Long questionId, LocalDate assignedDate
     );

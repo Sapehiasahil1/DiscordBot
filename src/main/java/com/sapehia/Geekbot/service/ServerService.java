@@ -19,17 +19,9 @@ public interface ServerService {
 
     List<Server> getAllServers();
 
-    void addMemberToServer(String guildId, Member memberEntity);
-
     void registerMemberToServer(String guildId, String userId, String username);
-
-    Set<Member> uniqueMemberResponse(String serverId, List<Member> members);
 
     List<Question> getQuestionFromServer(String serverId);
 
     void saveServerConfig(String serverId, LocalTime sendTime, List<String> questions, Set<DayOfWeek> excludedDays);
-
-    void updateServerExcludedDays(String serverId, Set<DayOfWeek> excludedDays);
-
-    Set<DayOfWeek> getServerExcludedDays(String serverId);
 }

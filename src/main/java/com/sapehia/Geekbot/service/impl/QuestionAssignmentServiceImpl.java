@@ -25,7 +25,7 @@ public class QuestionAssignmentServiceImpl implements QuestionAssignmentService 
     @Override
     public QuestionAssignment getByServerIdAndQuestionIdAndAssignedDate(String serverId, Long questionId, LocalDate assignedDate) {
         return questionAssignmentRepository.findAssignment(serverId, questionId, assignedDate)
-                .orElseThrow(()-> new RuntimeException("not found question Assignment"));
+                .orElse(null);
     }
 
     @Override

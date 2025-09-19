@@ -14,9 +14,10 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 50%, #f5f7fa 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .container {
@@ -25,17 +26,73 @@
             padding: 0 20px;
         }
 
+        /* Animated Background Elements */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            33% { transform: translateY(-30px) rotate(120deg); opacity: 0.9; }
+            66% { transform: translateY(-10px) rotate(240deg); opacity: 0.4; }
+            100% { transform: translateY(0px) rotate(360deg); opacity: 0.7; }
+        }
+
         /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
         }
 
         .nav {
@@ -47,40 +104,28 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 700;
-            color: #2d3748;
+            gap: 12px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #1a202c;
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            text-decoration: none;
-            color: #4a5568;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-menu a:hover {
-            color: #667eea;
+        .logo-icon:hover {
+            transform: scale(1.05) rotate(5deg);
         }
 
         .nav-buttons {
@@ -89,445 +134,429 @@
             align-items: center;
         }
 
-        .btn-login {
-            color: #4a5568;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
         .btn-primary {
-            background: #2d3748;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 32, 44, 0.3);
         }
 
         .btn-primary:hover {
-            background: #1a202c;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 32, 44, 0.4);
         }
 
         /* Main Content */
         .main-content {
-            margin-top: 80px;
-            padding: 80px 0;
-            position: relative;
-        }
-
-        .hero {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
+            margin-top: 100px;
+            padding: 100px 0;
             position: relative;
             z-index: 2;
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            line-height: 1.2;
+        .hero {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
         }
 
-        .hero h1 .highlight {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: #1a202c;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #667eea 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             color: #4a5568;
             margin-bottom: 50px;
-            max-width: 600px;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
+            font-weight: 400;
         }
 
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+        .cta-section {
+            margin-bottom: 80px;
         }
 
-        .btn-slack {
-            background: #4a154b;
+        .btn-discord {
+            background: linear-gradient(135deg, #5865f2 0%, #404eed 100%);
             color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 18px 40px;
+            border-radius: 50px;
             text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-teams {
-            background: #464eb8;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-slack:hover, .btn-teams:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .free-text {
-            color: #718096;
-            font-size: 14px;
-            margin-bottom: 60px;
-        }
-
-        /* Globe Background */
-        #home-globe {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.8;
-        }
-
-        @media(min-width: 991px) {
-            #home-globe {
-                background-image: url('https://geekbot.com/wp-content/themes/geekbot_new/images/new/landing/globe@2x.webp');
-                background-repeat: no-repeat;
-                background-position: right center;
-                background-size: contain;
-            }
-        }
-
-        /* User Avatars */
-        .user-avatars {
-            position: absolute;
-            top: 20%;
-            right: 10%;
-            z-index: 3;
-        }
-
-        .user-card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            display: flex;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-flex;
             align-items: center;
             gap: 12px;
-            min-width: 200px;
-            animation: float 6s ease-in-out infinite;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+            border: 2px solid transparent;
         }
 
-        .user-card:nth-child(2) {
-            animation-delay: -2s;
-            margin-left: 40px;
+        .btn-discord:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .user-card:nth-child(3) {
-            animation-delay: -4s;
-            margin-left: -20px;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .discord-icon {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #5865f2;
             font-weight: bold;
         }
 
-        .user-info h4 {
+        .free-badge {
+            display: inline-block;
+            background: rgba(56, 161, 105, 0.1);
+            color: #38a169;
+            padding: 10px 20px;
+            border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 2px;
+            margin-top: 30px;
+            border: 1px solid rgba(56, 161, 105, 0.3);
         }
 
-        .user-info p {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 4px;
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 100px 0;
         }
 
-        .user-info .status {
-            font-size: 11px;
-            color: #38a169;
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 4px;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: #38a169;
-            border-radius: 50%;
-        }
-
-        /* Ratings */
-        .ratings {
-            display: flex;
             justify-content: center;
-            gap: 40px;
-            margin: 60px 0;
-            flex-wrap: wrap;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
-        .rating-item {
-            text-align: center;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            min-width: 120px;
-        }
-
-        .rating-item .platform {
-            font-size: 14px;
-            color: #4a5568;
-            margin-bottom: 8px;
-        }
-
-        .rating-item .score {
-            font-size: 24px;
+        .feature-card h3 {
+            font-size: 1.4rem;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
+            color: #1a202c;
         }
 
-        .stars {
-            color: #f6ad55;
-            font-size: 14px;
+        .feature-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 1rem;
         }
 
-        /* Brand Logos */
+        /* Stats Section */
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 60px 40px;
+            border-radius: 30px;
+            margin: 100px auto;
+            max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #667eea;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        /* Brands */
+        .brands-section {
+            text-align: center;
+            margin: 100px 0;
+        }
+
+        .brands-title {
+            font-size: 1rem;
+            color: #718096;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
         .brands {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 40px;
-            margin-top: 80px;
+            gap: 50px;
             flex-wrap: wrap;
-            opacity: 0.6;
         }
 
-        .brand-logo {
-            height: 40px;
-            filter: grayscale(100%);
+        .brand-item {
+            font-size: 18px;
+            color: #9ca3af;
+            font-weight: 600;
             transition: all 0.3s ease;
+            padding: 10px 15px;
         }
 
-        .brand-logo:hover {
-            filter: grayscale(0%);
+        .brand-item:hover {
+            color: #667eea;
             transform: scale(1.1);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 3rem;
             }
 
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
+            .hero-subtitle {
+                font-size: 1.2rem;
             }
 
-            .user-avatars {
+            .features {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .brands {
+                gap: 30px;
+            }
+
+            .shape {
                 display: none;
             }
+        }
 
-            .ratings {
-                gap: 20px;
-            }
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <nav class="nav">
-                <div class="logo">
-                    <div class="logo-icon">DB</div>
-                    <span>Discord Bot</span>
-                </div>
-                <div class="nav-buttons">
-                    <a href="#" class="btn-primary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
-                    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
-                        <button type="submit" class="btn-primary">Logout</button>
-                    </form>
-                </div>
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
 
-            </nav>
+<header class="header" id="header">
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <span>Trackly</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="#" class="btn-primary" th:href="@{/dashboard}" sec:authorize="isAuthenticated()">Dashboard</a>
+                <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
+                    <button type="submit" class="btn-primary">Logout</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="hero fade-in">
+            <div class="hero-badge">🚀 Now available for Discord teams</div>
+            <h1>
+                Work better together<br>
+                wherever you are!
+            </h1>
+            <p class="hero-subtitle">
+                The easiest way to take daily attendance and keep your team on track — all inside Discord. Connect, collaborate, and stay synchronized with your remote team.
+            </p>
+
+            <div class="cta-section">
+                <a href="/oauth2/authorization/discord" class="btn-discord" th:href="@{/add-to-slack}">
+                    <div class="discord-icon">D</div>
+                    Sign in with Discord
+                </a>
+                <div class="free-badge">✨ Free for teams up to 10 users</div>
+            </div>
         </div>
-    </header>
 
-    <main class="main-content">
-        <div class="container">
-            <!-- Globe Background -->
-            <div id="home-globe"></div>
+        <div class="features fade-in">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Smart Attendance</h3>
+                <p>Automated daily check-ins that adapt to your team's schedule. No more manual tracking or missed updates.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Goal Tracking</h3>
+                <p>Set and monitor team objectives with real-time progress updates. Keep everyone aligned and motivated.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Setup</h3>
+                <p>Get up and running in under 2 minutes. No complex configuration or technical expertise required.</p>
+            </div>
+        </div>
 
-<!--            &lt;!&ndash; User Avatars &ndash;&gt;-->
-<!--            <div class="user-avatars">-->
-<!--                <div class="user-card">-->
-<!--                    <div class="user-avatar">B</div>-->
-<!--                    <div class="user-info">-->
-<!--                        <h4>Brandon</h4>-->
-<!--                        <p>UI/UX Design</p>-->
-<!--                        <div class="status">-->
-<!--                            <div class="status-dot"></div>-->
-<!--                            Helsinki - 7pm-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="user-card">-->
-<!--                    <div class="user-avatar">K</div>-->
-<!--                    <div class="user-info">-->
-<!--                        <h4>Kate</h4>-->
-<!--                        <p>Product Manager</p>-->
-<!--                        <div class="status">-->
-<!--                            <div class="status-dot"></div>-->
-<!--                            Los Angeles - 9am-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="user-card">-->
-<!--                    <div class="user-avatar">N</div>-->
-<!--                    <div class="user-info">-->
-<!--                        <h4>Noah</h4>-->
-<!--                        <p>Full-stack Engineer</p>-->
-<!--                        <div class="status">-->
-<!--                            <div class="status-dot"></div>-->
-<!--                            Buenos Aires - 2pm-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
+        <div class="stats fade-in">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2min</div>
+                    <div class="stat-label">Setup Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+
+<!--        <div class="brands-section fade-in">-->
+<!--            <div class="brands-title">Trusted by teams at</div>-->
+<!--            <div class="brands">-->
+<!--                <div class="brand-item">Sword</div>-->
+<!--                <div class="brand-item">WeTransfer</div>-->
+<!--                <div class="brand-item">BLUEGROUND</div>-->
+<!--                <div class="brand-item">Mozilla</div>-->
+<!--                <div class="brand-item">Zendesk</div>-->
+<!--                <div class="brand-item">Adobe</div>-->
 <!--            </div>-->
+<!--        </div>-->
+    </div>
+</main>
 
-            <!-- Hero Section -->
-            <div class="hero">
-                <h1>
-                    Work <span class="highlight">better together</span><br>
-                    wherever <strong>you are!</strong>
-                </h1>
-                <p class="hero-subtitle">
-                    “The easiest way to take daily attendance and keep your team on track — all inside Discord.”
-                </p>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
 
-                <div class="cta-buttons">
-                    <a href="/oauth2/authorization/discord" class="btn-slack" th:href="@{/add-to-slack}">
-                        <span>🔧</span> Sign in with Discord
-                    </a>
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-                </div>
-
-                <p class="free-text">Free for teams of up to 10 users - no credit card required.</p>
-            </div>
-
-            <!-- Ratings -->
-            <div class="ratings">
-                <div class="rating-item">
-                    <div class="platform">💼 GetApp</div>
-                    <div class="score">4.9</div>
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                </div>
-                <div class="rating-item">
-                    <div class="platform">📈 Capterra</div>
-                    <div class="score">4.9</div>
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                </div>
-                <div class="rating-item">
-                    <div class="platform">⭐ Reviews</div>
-                    <div class="score">4.6</div>
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                </div>
-            </div>
-
-            <!-- Brand Logos -->
-            <div class="brands">
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Sword</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">WeTransfer</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">BLUEGROUND</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">moz://a</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">zendesk</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Adobe</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">productboard</span>
-                <span style="font-size: 20px; color: #9ca3af; font-weight: 500;">Mural</span>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scroll for navigation
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
             });
+        }, observerOptions);
 
-            // Add hover effects to buttons
-            const buttons = document.querySelectorAll('.btn-slack, .btn-teams, .btn-primary');
-            buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                });
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Button hover effects
+        const buttons = document.querySelectorAll('.btn-discord, .btn-primary');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.02)';
             });
-
-            // Animate user cards on scroll
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            });
-
-            document.querySelectorAll('.user-card').forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.6s ease';
-                observer.observe(card);
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
             });
         });
-    </script>
+
+        // Feature card stagger animation
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.2}s`;
+        });
+    });
+</script>
 </body>
 </html>

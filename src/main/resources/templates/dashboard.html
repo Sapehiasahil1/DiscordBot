@@ -14,28 +14,98 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #1a202c;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e0 50%, #f1f5f9 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
-        /* Header - Same as landing page */
+        /* Animated Background Elements */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 20%;
+            animation: drift 25s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 140px;
+            height: 100px;
+            background: rgba(148, 163, 184, 0.08);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 90px;
+            height: 120px;
+            background: rgba(203, 213, 225, 0.06);
+            top: 60%;
+            left: 80%;
+            animation-delay: -8s;
+        }
+
+        .shape:nth-child(3) {
+            width: 110px;
+            height: 85px;
+            background: rgba(100, 116, 139, 0.07);
+            top: 15%;
+            left: 85%;
+            animation-delay: -16s;
+        }
+
+        .shape:nth-child(4) {
+            width: 95px;
+            height: 95px;
+            background: rgba(226, 232, 240, 0.09);
+            top: 75%;
+            left: 15%;
+            animation-delay: -4s;
+        }
+
+        @keyframes drift {
+            0% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.6; }
+            25% { transform: translateY(-25px) translateX(15px) rotate(90deg); opacity: 0.9; }
+            50% { transform: translateY(-10px) translateX(-20px) rotate(180deg); opacity: 0.4; }
+            75% { transform: translateY(-35px) translateX(10px) rotate(270deg); opacity: 0.7; }
+            100% { transform: translateY(0px) translateX(0px) rotate(360deg); opacity: 0.6; }
+        }
+
+        /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .nav {
@@ -47,40 +117,28 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 700;
-            color: #2d3748;
+            gap: 12px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #1a202c;
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            text-decoration: none;
-            color: #4a5568;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-menu a:hover {
-            color: #667eea;
+        .logo-icon:hover {
+            transform: scale(1.05) rotate(5deg);
         }
 
         .nav-buttons {
@@ -90,215 +148,385 @@
         }
 
         .btn-primary {
-            background: #2d3748;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 32, 44, 0.3);
         }
 
         .btn-primary:hover {
-            background: #1a202c;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 32, 44, 0.4);
         }
 
         .btn-secondary {
-            background: transparent;
-            color: #4a5568;
-            padding: 12px 24px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #1a202c;
+            padding: 12px 28px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: 2px solid #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .btn-secondary:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         /* Main Content */
         .main-content {
             margin-top: 100px;
-            padding: 40px 0;
+            padding: 60px 0;
+            position: relative;
+            z-index: 2;
         }
 
         /* Welcome Section */
         .welcome-section {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         .welcome-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #2d3748;
-            margin-bottom: 10px;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #667eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .welcome-subtitle {
-            font-size: 1.1rem;
-            color: #718096;
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 40px;
+            font-weight: 400;
         }
 
         .user-info {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 20px 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .user-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
         }
 
         .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-details {
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            color: #4a5568;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #38a169;
+            border-radius: 50%;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 20px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #1a202c;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .quick-action:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
         }
 
         /* Servers Section */
         .servers-section {
-            margin-bottom: 50px;
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
         }
 
         .section-title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 30px;
-            text-align: center;
+            color: #1a202c;
+        }
+
+        .server-count {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .servers-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
         .server-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 1px solid rgba(148, 163, 184, 0.15);
             text-decoration: none;
             color: inherit;
             display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.05), transparent);
+            transition: left 0.6s;
+        }
+
+        .server-card:hover::before {
+            left: 100%;
         }
 
         .server-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: rgba(102, 126, 234, 0.3);
         }
 
         .server-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .server-icon {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 28px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .server-card:hover .server-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .server-info h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 5px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
         }
 
         .server-role {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
             color: white;
-            padding: 4px 12px;
+            padding: 6px 15px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .server-role.owner {
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
         }
 
         .server-description {
-            color: #718096;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .no-servers {
-            text-align: center;
-            padding: 60px 20px;
-            color: #718096;
-        }
-
-        .no-servers-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .no-servers h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
             color: #4a5568;
-            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
-        /* Loading Animation */
-        .loading {
+        .server-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .stat-item {
             text-align: center;
-            padding: 40px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-invite {
+            background: linear-gradient(135deg, #5865f2 0%, #404eed 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+        }
+
+        .btn-invite:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-
             .welcome-title {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             .servers-grid {
@@ -308,42 +536,67 @@
             .user-info {
                 flex-direction: column;
                 text-align: center;
+                padding: 25px;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .shape {
+                display: none;
             }
         }
 
-        /* Success Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
         }
 
-        .server-card {
-            animation: fadeInUp 0.6s ease forwards;
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .server-card:nth-child(2) { animation-delay: 0.1s; }
-        .server-card:nth-child(3) { animation-delay: 0.2s; }
-        .server-card:nth-child(4) { animation-delay: 0.3s; }
-        .server-card:nth-child(5) { animation-delay: 0.4s; }
+        .slide-in {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s ease;
+        }
+
+        .slide-in.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body>
-<!-- Header - Same as landing page -->
-<header class="header">
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<header class="header" id="header">
     <div class="container">
         <nav class="nav">
             <div class="logo">
-                <div class="logo-icon">TL</div>
+                <div class="logo-icon">T</div>
                 <span>Trackly</span>
             </div>
             <div class="nav-buttons">
-                <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot" class="btn-secondary" sec:authorize="isAuthenticated()">Invite Bot</a>
+                <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot"
+                   class="btn-secondary" sec:authorize="isAuthenticated()">📋 Invite Bot</a>
                 <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
                     <button type="submit" class="btn-primary">Logout</button>
                 </form>
@@ -352,148 +605,261 @@
     </div>
 </header>
 
-<!-- Main Content -->
 <main class="main-content">
     <div class="container">
         <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1 class="welcome-title">Welcome to Your Dashboard</h1>
-            <p class="welcome-subtitle">Manage your Discord servers and bot settings</p>
+        <div class="welcome-section fade-in">
+            <h1 class="welcome-title">Dashboard</h1>
+            <p class="welcome-subtitle">Manage your Discord servers and track attendance</p>
 
             <div class="user-info" th:if="${user}">
                 <div class="user-avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</div>
-                <div>
-                    <div style="font-weight: 600; color: #2d3748;">
+                <div class="user-details">
+                    <div class="user-name">
                         <span th:text="${user.username}">Username</span>#<span th:text="${user.discriminator}">0000</span>
                     </div>
-
+                    <div class="user-status">
+                        <div class="status-dot"></div>
+                        Online
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Quick Actions -->
+<!--        <div class="quick-actions slide-in">-->
+<!--            <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot"-->
+<!--               class="quick-action">-->
+<!--                <div class="action-icon">🤖</div>-->
+<!--                <span>Invite Bot</span>-->
+<!--            </a>-->
+<!--            <a href="#" class="quick-action">-->
+<!--                <div class="action-icon">📊</div>-->
+<!--                <span>View Analytics</span>-->
+<!--            </a>-->
+<!--            <a href="#" class="quick-action">-->
+<!--                <div class="action-icon">⚙️</div>-->
+<!--                <span>Settings</span>-->
+<!--            </a>-->
+<!--        </div>-->
+
         <!-- Servers Section -->
-        <div class="servers-section">
-            <h2 class="section-title">Your Managed Servers</h2>
+        <div class="servers-section fade-in">
+            <div class="section-header">
+                <h2 class="section-title">Your Servers</h2>
+                <div class="server-count" th:if="${guilds != null}" th:text="${#lists.size(guilds)} + ' servers'">0 servers</div>
+            </div>
 
             <!-- Server Cards Grid -->
             <div class="servers-grid" th:if="${guilds != null and !#lists.isEmpty(guilds)}">
-                <!-- Only show servers where user is admin/owner -->
                 <div th:each="guild : ${guilds}" th:if="${guild.isAdminOrOwner}">
-                    <a href="#" class="server-card" th:href="@{'/server/' + ${guild.id}}"
-                       >
+                    <a href="#" class="server-card" th:href="@{'/server/' + ${guild.id}}">
                         <div class="server-header">
                             <div class="server-icon" th:text="${#strings.substring(guild.name, 0, 1).toUpperCase()}">S</div>
                             <div class="server-info">
                                 <h3 th:text="${guild.name}">Server Name</h3>
-                                <span class="server-role" th:text="${guild.owner ? 'Owner' : 'Admin'}">Admin</span>
+                                <span class="server-role" th:class="${guild.owner ? 'server-role owner' : 'server-role'}"
+                                      th:text="${guild.owner ? 'Owner' : 'Admin'}">Admin</span>
                             </div>
                         </div>
                         <div class="server-description">
-                            Click to manage bot settings and view attendance data for this server.
+                            Manage bot settings, view attendance reports, and track your team's productivity in real-time.
+                        </div>
+                        <div class="server-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Members</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Reports</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">100%</div>
+                                <div class="stat-label">Uptime</div>
+                            </div>
                         </div>
                     </a>
                 </div>
             </div>
 
-            <!-- No Servers Message -->
-            <div class="no-servers" id="no-admin-servers"
-                 th:if="${guilds == null or guilds.isEmpty() or !hasAdminGuilds}">
-                <h3>No Managed Servers Found</h3>
-                <p>You don't have admin or owner permissions in any Discord servers yet.</p>
-                <p style="margin-top: 15px;">
-                    <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot" class="btn-primary" style="display: inline-block;">Invite Bot to Server</a>
-                </p>
+            <!-- Empty State -->
+            <div class="empty-state fade-in" th:if="${guilds == null or guilds.isEmpty() or !hasAdminGuilds}">
+                <div class="empty-icon">🏰</div>
+                <h3>No Servers Yet</h3>
+                <p>You don't have admin permissions in any Discord servers with Trackly Bot. Invite the bot to your server to get started!</p>
+                <a href="https://discord.com/oauth2/authorize?client_id=1410154120119058555&permissions=414464814080&integration_type=0&scope=applications.commands+bot"
+                   class="btn-invite">
+                    🚀 Invite Trackly Bot
+                </a>
             </div>
         </div>
     </div>
 </main>
 
 <script>
-    // Handle server card clicks
-    function handleServerClick(url) {
-        // Extract server ID from URL
-        const serverId = url.split('/').pop();
-
-        // Show loading state
-        const card = event.target.closest('.server-card');
-        if (card) {
-            card.style.opacity = '0.7';
-            card.style.transform = 'scale(0.98)';
-        }
-
-        // Make request to controller
-        fetch(`/server/${serverId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Redirect to server management page
-                window.location.href = url;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
             } else {
-                console.error('Failed to access server');
-                // Reset card state
-                if (card) {
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Reset card state
-            if (card) {
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
+                header.classList.remove('scrolled');
             }
         });
-    }
 
-    // Add hover effects to server cards
-    document.addEventListener('DOMContentLoaded', function() {
-        const serverCards = document.querySelectorAll('.server-card');
-        const serversGrid = document.querySelector('.servers-grid');
-        const noAdminServers = document.getElementById('no-admin-servers');
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        // Check if there are any admin/owner servers visible
-        if (serverCards.length === 0 && serversGrid) {
-            // Show no admin servers message if grid exists but no cards are visible
-            if (noAdminServers) {
-                noAdminServers.style.display = 'block';
-            }
-        }
-
-        serverCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px) scale(1.02)';
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
             });
+        }, observerOptions);
 
-            card.addEventListener('mouseleave', function() {
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in, .slide-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Server card animations
+        const serverCards = document.querySelectorAll('.server-card');
+        serverCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+
+            // Add click analytics
+            card.addEventListener('click', function(e) {
+                const serverName = this.querySelector('h3').textContent;
+                console.log(`Navigating to server: ${serverName}`);
+            });
+        });
+
+        // Enhanced hover effects
+        document.querySelectorAll('.quick-action').forEach(action => {
+            action.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.05)';
+            });
+            action.addEventListener('mouseleave', function() {
                 this.style.transform = 'translateY(0) scale(1)';
             });
         });
 
-        // Animate cards on load
-        serverCards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
+        // Logout confirmation with style
+        const logoutBtn = document.querySelector('form[action*="/logout"] button');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
 
-            setTimeout(() => {
-                card.style.transition = 'all 0.6s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
+                // Create custom confirmation modal
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                `;
+
+                modal.innerHTML = `
+                    <div style="
+                        background: rgba(255,255,255,0.95);
+                        padding: 40px;
+                        border-radius: 20px;
+                        text-align: center;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                        backdrop-filter: blur(20px);
+                        border: 1px solid rgba(255,255,255,0.3);
+                        max-width: 400px;
+                    ">
+                        <h3 style="margin-bottom: 15px; color: #1a202c;">Confirm Logout</h3>
+                        <p style="margin-bottom: 30px; color: #4a5568;">Are you sure you want to logout?</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button id="cancelLogout" style="
+                                padding: 12px 24px;
+                                border: none;
+                                border-radius: 50px;
+                                background: rgba(0,0,0,0.1);
+                                color: #4a5568;
+                                cursor: pointer;
+                                font-weight: 600;
+                            ">Cancel</button>
+                            <button id="confirmLogout" style="
+                                padding: 12px 24px;
+                                border: none;
+                                border-radius: 50px;
+                                background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+                                color: white;
+                                cursor: pointer;
+                                font-weight: 600;
+                            ">Logout</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                document.getElementById('cancelLogout').onclick = () => {
+                    document.body.removeChild(modal);
+                };
+
+                document.getElementById('confirmLogout').onclick = () => {
+                    this.form.submit();
+                };
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                };
+            });
+        }
+
+        // Add loading state to server cards
+        serverCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255,255,255,0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 25px;
+                    backdrop-filter: blur(5px);
+                `;
+                loadingOverlay.innerHTML = '<div style="width: 30px; height: 30px; border: 3px solid #e2e8f0; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
+
+                this.style.position = 'relative';
+                this.appendChild(loadingOverlay);
+            });
         });
     });
 
-    // Add logout confirmation
-    document.querySelector('form[action*="/logout"] button').addEventListener('click', function(e) {
-        if (!confirm('Are you sure you want to logout?')) {
-            e.preventDefault();
+    // Add spin animation for loading
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-    });
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
